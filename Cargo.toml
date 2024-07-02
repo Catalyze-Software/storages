@@ -1,0 +1,8 @@
+[workspace]
+resolver = "2"
+members = ["src/*"]
+
+[workspace.dependencies]
+candid = "0.10"
+ic-cdk = "0.14"
+catalyze-shared = { git = "https://github.com/Catalyze-Software/catalyze-shared" }
