@@ -15,7 +15,3 @@ ic-cdk = { workspace = true }
 catalyze-shared = { workspace = true }
 
 common = { path = "../common" }
-
-[profile.release]
-lto = true
-opt-level = 'z'

@@ -1,4 +1,6 @@
 service : {
   __get_candid_interface_tmp_hack : () -> (text) query;
   greet : (text) -> (text) query;
+  icts_name : () -> (text) query;
+  icts_version : () -> (text) query;
 }

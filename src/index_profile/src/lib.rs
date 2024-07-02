@@ -5,6 +5,16 @@ fn greet(name: String) -> String {
     common::greet(name)
 }
 
+#[query]
+fn icts_name() -> String {
+    env!("CARGO_PKG_NAME").to_string()
+}
+
+#[query]
+fn icts_version() -> String {
+    env!("CARGO_PKG_VERSION").to_string()
+}
+
 // Hacky way to expose the candid interface to the outside world
 #[query(name = "__get_candid_interface_tmp_hack")]
 pub fn __export_did_tmp_() -> String {

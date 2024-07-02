@@ -6,7 +6,3 @@ edition = "2021"
 [dependencies]
 candid = { workspace = true }
 ic-cdk = { workspace = true }
-
-[profile.release]
-lto = true
-opt-level = 'z'
