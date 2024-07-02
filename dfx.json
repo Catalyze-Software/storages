@@ -1,0 +1,22 @@
+{
+  "canisters": {
+    "index_profile": {
+      "type": "custom",
+      "package": "index_profile",
+      "candid": "candid/index_profile.did",
+      "wasm": "wasm/index_profile.wasm.gz",
+      "build": [
+        "bash scripts/build.sh"
+      ]
+    },
+    "shard_profile": {
+      "type": "custom",
+      "package": "shard_profile",
+      "candid": "candid/shard_profile.did",
+      "wasm": "wasm/shard_profile.wasm.gz",
+      "build": [
+        "bash scripts/build.sh"
+      ]
+    }
+  }
+}
