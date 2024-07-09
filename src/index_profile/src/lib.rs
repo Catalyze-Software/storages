@@ -1,18 +1,49 @@
-use ic_cdk::query;
+use candid::Principal;
+use catalyze_shared::CanisterResult;
+use common::{queries, CellStorage, Principals};
+use ic_cdk::{init, query, trap, update};
+use storage::Storages;
 
-#[ic_cdk::query]
-fn greet(name: String) -> String {
-    common::greet(name)
-}
+mod storage;
 
 #[query]
 fn icts_name() -> String {
-    env!("CARGO_PKG_NAME").to_string()
+    queries::icts_name()
 }
 
 #[query]
 fn icts_version() -> String {
-    env!("CARGO_PKG_VERSION").to_string()
+    queries::icts_version()
+}
+
+#[init]
+fn init(proxies: Vec<Principal>, _shards: u64) {
+    if proxies.is_empty() {
+        trap("Proxies cannot be empty");
+    }
+
+    Storages::proxies()
+        .set(proxies.into())
+        .expect("Failed to set proxies");
+
+    // TODO: add deploy logic
+    let shards = vec![];
+
+    Storages::shards()
+        .set(shards.clone().into())
+        .expect("Failed to set shards");
+
+    Storages::shard_iter()
+        .set(shards[0])
+        .expect("Failed to set shard iter");
+}
+
+#[update]
+fn extend_shards(_shards: u64) -> CanisterResult<Principals> {
+    let mut shards = Storages::shards().get()?;
+    // TODO: add deploy logic
+    shards.append(&mut vec![]);
+    Storages::shards().set(shards)
 }
 
 // Hacky way to expose the candid interface to the outside world

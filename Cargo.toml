@@ -4,7 +4,11 @@ members = ["src/*"]
 
 [workspace.dependencies]
 candid = "0.10"
+serde = { version = "1", features = ["derive"] }
+
 ic-cdk = "0.14"
+ic-stable-structures = "0.6"
+
 catalyze-shared = { git = "https://github.com/Catalyze-Software/catalyze-shared" }
 
 [profile.release]
