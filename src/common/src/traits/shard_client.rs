@@ -2,6 +2,8 @@ use candid::{utils::ArgumentEncoder, CandidType, Principal};
 use catalyze_shared::{api_error::ApiError, CanisterResult};
 use serde::Deserialize;
 
+use crate::Filter;
+
 #[derive(CandidType, Deserialize)]
 pub enum CanisterCallResult<T> {
     Ok(T),
@@ -64,6 +66,22 @@ where
         shard: Principal,
     ) -> impl std::future::Future<Output = CanisterResult<Vec<(K, V)>>> + Sync + Send {
         self.call(shard, "get_all", ())
+    }
+
+    fn find(
+        &self,
+        shard: Principal,
+        filters: Vec<impl Filter<V>>,
+    ) -> impl std::future::Future<Output = CanisterResult<Option<(K, V)>>> + Sync + Send {
+        self.call(shard, "find", (filters,))
+    }
+
+    fn filter(
+        &self,
+        shard: Principal,
+        filters: Vec<impl Filter<V>>,
+    ) -> impl std::future::Future<Output = CanisterResult<Vec<(K, V)>>> + Sync + Send {
+        self.call(shard, "filter", (filters,))
     }
 
     fn insert(

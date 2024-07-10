@@ -5,7 +5,7 @@ use candid::Principal;
 use catalyze_shared::{api_error::ApiError, CanisterResult};
 use ic_stable_structures::Storable;
 
-use crate::{CellStorage, IDMap, Principals, ShardClient};
+use crate::{CellStorage, Filter, IDMap, Principals, ShardClient};
 
 #[async_trait]
 pub trait StorageIndex<K, V>: Send + Sync
@@ -79,6 +79,8 @@ where
             res.extend(values);
         }
 
+        // TODO: Sort
+
         Ok(res)
     }
 
@@ -91,10 +93,37 @@ where
             res.extend(values);
         }
 
+        // TODO: Sort
+
         Ok(res)
     }
 
-    // TODO: add find and filter methods
+    async fn find(&self, filters: Vec<impl Filter<V>>) -> CanisterResult<Option<(K, V)>> {
+        let shards = self.shards().get()?;
+
+        for shard in shards.to_vec().iter() {
+            let value = self.client().find(*shard, filters.clone()).await?;
+            if value.is_some() {
+                return Ok(value);
+            }
+        }
+
+        Ok(None)
+    }
+
+    async fn filter(&self, filters: Vec<impl Filter<V>>) -> CanisterResult<Vec<(K, V)>> {
+        let mut res = Vec::new();
+        let shards = self.shards().get()?;
+
+        for shard in shards.to_vec().iter() {
+            let values = self.client().filter(*shard, filters.clone()).await?;
+            res.extend(values);
+        }
+
+        // TODO: Sort
+
+        Ok(res)
+    }
 
     async fn insert(&self, key: K, value: V) -> CanisterResult<(K, V)> {
         if self.ids().exists(key.clone()) {
