@@ -17,7 +17,7 @@ impl<T> From<CanisterCallResult<T>> for CanisterResult<T> {
     }
 }
 
-pub trait ShardClient<K, V>
+pub trait ShardClient<K, V>: Send + Sync
 where
     K: candid::CandidType + for<'a> candid::Deserialize<'a>,
     V: candid::CandidType + for<'a> candid::Deserialize<'a>,
@@ -43,13 +43,11 @@ where
         }
     }
 
-    // TODO: add find and filter methods if its makes sense
-
     fn get(
         &self,
         shard: Principal,
         id: K,
-    ) -> impl std::future::Future<Output = CanisterResult<V>> + Sync + Send {
+    ) -> impl std::future::Future<Output = CanisterResult<(K, V)>> + Sync + Send {
         self.call(shard, "get", (id,))
     }
 

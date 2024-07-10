@@ -7,6 +7,9 @@ edition = "2021"
 candid = { workspace = true }
 serde = { workspace = true }
 
+async-trait = { workspace = true }
+futures = { workspace = true }
+
 ic-cdk = { workspace = true }
 ic-stable-structures = { workspace = true }
 

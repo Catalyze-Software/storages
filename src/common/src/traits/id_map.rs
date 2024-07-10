@@ -2,7 +2,7 @@ use candid::Principal;
 use catalyze_shared::{api_error::ApiError, CanisterResult, StaticStorageRef};
 use ic_stable_structures::Storable;
 
-pub trait IDMap<K: 'static + Storable + Ord + Clone> {
+pub trait IDMap<K: 'static + Storable + Ord + Clone>: Send + Sync {
     fn name(&self) -> String;
     fn raw(&self) -> StaticStorageRef<K, Principal>;
 
@@ -28,5 +28,9 @@ pub trait IDMap<K: 'static + Storable + Ord + Clone> {
             data.borrow_mut().insert(id.clone(), principal);
             Ok((id, principal))
         })
+    }
+
+    fn exists(&self, id: K) -> bool {
+        self.raw().with(|data| data.borrow().contains_key(&id))
     }
 }
