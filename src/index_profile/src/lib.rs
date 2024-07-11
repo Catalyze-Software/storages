@@ -6,6 +6,7 @@ use storage::{Proxies, ShardIter, Shards};
 
 mod calls;
 mod index;
+mod models;
 mod storage;
 
 #[query]
@@ -51,9 +52,10 @@ fn extend_shards(_shards: u64) -> CanisterResult<Principals> {
 // Hacky way to expose the candid interface to the outside world
 #[query(name = "__get_candid_interface_tmp_hack")]
 pub fn __export_did_tmp_() -> String {
-    use crate::calls::ProfileEntry;
+    use crate::{calls::ProfileEntry, models::ProfileFilter};
     use candid::export_service;
     use catalyze_shared::profile::Profile;
+
     export_service!();
     __export_service()
 }

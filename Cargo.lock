@@ -395,6 +395,7 @@ dependencies = [
  "common",
  "ic-cdk",
  "ic-stable-structures",
+ "serde",
 ]
 
 [[package]]

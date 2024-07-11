@@ -5,7 +5,7 @@ use candid::Principal;
 use catalyze_shared::{api_error::ApiError, CanisterResult};
 use ic_stable_structures::Storable;
 
-use crate::{CellStorage, Filter, IDMap, Principals, ShardClient};
+use crate::{CellStorage, Filter, IDMap, Principals, ShardClient, Sorter};
 
 #[async_trait]
 pub trait StorageIndex<K, V>: Send + Sync
@@ -35,6 +35,8 @@ where
     fn ids(&self) -> impl IDMap<K>;
     /// Shard client
     fn client(&self) -> impl ShardClient<K, V>;
+    /// Default sorter for values
+    fn sorter(&self) -> impl Sorter<K, V>;
 
     /// Get the next shard in the round-robin sequence
     fn next_shard(&self) -> CanisterResult<Principal> {
@@ -79,12 +81,11 @@ where
             res.extend(values);
         }
 
-        // TODO: Sort
-
-        Ok(res)
+        Ok(self.sorter().sort(res))
     }
 
     async fn get_all(&self) -> CanisterResult<Vec<(K, V)>> {
+        // TODO: pagination
         let mut res = Vec::new();
         let shards = self.shards().get()?;
 
@@ -93,9 +94,7 @@ where
             res.extend(values);
         }
 
-        // TODO: Sort
-
-        Ok(res)
+        Ok(self.sorter().sort(res))
     }
 
     async fn find(&self, filters: Vec<impl Filter<V>>) -> CanisterResult<Option<(K, V)>> {
@@ -112,6 +111,7 @@ where
     }
 
     async fn filter(&self, filters: Vec<impl Filter<V>>) -> CanisterResult<Vec<(K, V)>> {
+        // TODO: pagination
         let mut res = Vec::new();
         let shards = self.shards().get()?;
 
@@ -120,9 +120,7 @@ where
             res.extend(values);
         }
 
-        // TODO: Sort
-
-        Ok(res)
+        Ok(self.sorter().sort(res))
     }
 
     async fn insert(&self, key: K, value: V) -> CanisterResult<(K, V)> {
