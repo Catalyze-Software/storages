@@ -8,9 +8,6 @@ where
 {
     fn name(&self) -> String;
     fn storage(&self) -> StaticStorageRef<K, V>;
-    // fn apply_filter<F>(&self, filter: F) -> Vec<(K, V)>
-    // where
-    //     F: Fn(&K, &V) -> bool;
 
     fn insert_by_key(&self, key: K, value: V) -> CanisterResult<(K, V)> {
         self.storage().with(|data| {
