@@ -1,15 +1,13 @@
 mod cell;
 mod id_map;
-mod list;
-mod map;
-mod shard;
+mod index_controller;
 mod shard_client;
-mod storage_index;
+mod shard_controller;
+mod shard_storage;
 
 pub use cell::*;
 pub use id_map::*;
-pub use list::*;
-pub use map::*;
-pub use shard::*;
+pub use index_controller::*;
 pub use shard_client::*;
-pub use storage_index::*;
+pub use shard_controller::*;
+pub use shard_storage::*;

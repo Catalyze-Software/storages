@@ -2,13 +2,13 @@ use std::{collections::HashMap, fmt::Display};
 
 use async_trait::async_trait;
 use candid::Principal;
-use catalyze_shared::{api_error::ApiError, CanisterResult};
+use catalyze_shared::{api_error::ApiError, CanisterResult, Sorter};
 use ic_stable_structures::Storable;
 
-use crate::{CellStorage, Filter, IDMap, Principals, ShardClient, Sorter};
+use crate::{CellStorage, IDMap, Principals, ShardClient};
 
 #[async_trait]
-pub trait StorageIndex<K, V>: Send + Sync
+pub trait IndexController<K, V, F>: Send + Sync
 where
     K: 'static
         + candid::CandidType
@@ -26,6 +26,7 @@ where
         + Clone
         + Send
         + Sync,
+    F: 'static + candid::CandidType + Clone + Send + Sync,
 {
     /// Shards storage
     fn shards(&self) -> impl CellStorage<Principals>;
@@ -34,7 +35,7 @@ where
     /// Entry ID to shard mapping storage
     fn ids(&self) -> impl IDMap<K>;
     /// Shard client
-    fn client(&self) -> impl ShardClient<K, V>;
+    fn client(&self) -> impl ShardClient<K, V, F>;
     /// Default sorter for values
     fn sorter(&self) -> impl Sorter<K, V>;
 
@@ -97,7 +98,7 @@ where
         Ok(self.sorter().sort(res))
     }
 
-    async fn find(&self, filters: Vec<impl Filter<V>>) -> CanisterResult<Option<(K, V)>> {
+    async fn find(&self, filters: Vec<F>) -> CanisterResult<Option<(K, V)>> {
         let shards = self.shards().get()?;
 
         for shard in shards.to_vec().iter() {
@@ -110,7 +111,7 @@ where
         Ok(None)
     }
 
-    async fn filter(&self, filters: Vec<impl Filter<V>>) -> CanisterResult<Vec<(K, V)>> {
+    async fn filter(&self, filters: Vec<F>) -> CanisterResult<Vec<(K, V)>> {
         // TODO: pagination
         let mut res = Vec::new();
         let shards = self.shards().get()?;

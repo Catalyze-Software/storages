@@ -21,7 +21,7 @@ impl CellStorage<Principals> for Proxies {
         self.name.clone()
     }
 
-    fn raw(&self) -> StaticCellStorageRef<Principals> {
+    fn storage(&self) -> StaticCellStorageRef<Principals> {
         self.storage
     }
 }

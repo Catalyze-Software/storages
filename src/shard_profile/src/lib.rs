@@ -1,5 +1,9 @@
-use common::queries;
-use ic_cdk::query;
+use common::{queries, CellStorage};
+use ic_cdk::{caller, init, query};
+use storage::Index;
+
+mod controller;
+mod storage;
 
 #[query]
 fn icts_name() -> String {
@@ -17,6 +21,13 @@ pub fn __export_did_tmp_() -> String {
     use candid::export_service;
     export_service!();
     __export_service()
+}
+
+#[init]
+fn init() {
+    Index::default()
+        .set(caller())
+        .expect("Failed to set index canister ID");
 }
 
 // Method used to save the candid interface to a file

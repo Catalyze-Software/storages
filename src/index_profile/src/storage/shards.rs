@@ -20,7 +20,7 @@ impl CellStorage<Principals> for Shards {
         self.name.clone()
     }
 
-    fn raw(&self) -> StaticCellStorageRef<Principals> {
+    fn storage(&self) -> StaticCellStorageRef<Principals> {
         self.storage
     }
 }

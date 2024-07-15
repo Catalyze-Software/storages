@@ -23,7 +23,7 @@ impl IDMap<Principal> for IDs {
         self.name.clone()
     }
 
-    fn raw(&self) -> StaticStorageRef<Principal, Principal> {
+    fn storage(&self) -> StaticStorageRef<Principal, Principal> {
         self.storage
     }
 }

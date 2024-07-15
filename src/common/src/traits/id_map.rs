@@ -4,10 +4,10 @@ use ic_stable_structures::Storable;
 
 pub trait IDMap<K: 'static + Storable + Ord + Clone>: Send + Sync {
     fn name(&self) -> String;
-    fn raw(&self) -> StaticStorageRef<K, Principal>;
+    fn storage(&self) -> StaticStorageRef<K, Principal>;
 
     fn shard_by_id(&self, id: K) -> CanisterResult<Principal> {
-        self.raw().with(|data| {
+        self.storage().with(|data| {
             data.borrow().get(&id).ok_or(
                 ApiError::not_found()
                     .add_method_name("get")
@@ -17,7 +17,7 @@ pub trait IDMap<K: 'static + Storable + Ord + Clone>: Send + Sync {
     }
 
     fn insert(&self, id: K, principal: Principal) -> CanisterResult<(K, Principal)> {
-        self.raw().with(|data| {
+        self.storage().with(|data| {
             if data.borrow().contains_key(&id) {
                 return Err(ApiError::duplicate()
                     .add_method_name("insert")
@@ -31,6 +31,6 @@ pub trait IDMap<K: 'static + Storable + Ord + Clone>: Send + Sync {
     }
 
     fn exists(&self, id: K) -> bool {
-        self.raw().with(|data| data.borrow().contains_key(&id))
+        self.storage().with(|data| data.borrow().contains_key(&id))
     }
 }

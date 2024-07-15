@@ -6,7 +6,6 @@ use storage::{Proxies, ShardIter, Shards};
 
 mod calls;
 mod index;
-mod models;
 mod storage;
 
 #[query]
@@ -17,6 +16,17 @@ fn icts_name() -> String {
 #[query]
 fn icts_version() -> String {
     queries::icts_version()
+}
+
+// Hacky way to expose the candid interface to the outside world
+#[query(name = "__get_candid_interface_tmp_hack")]
+pub fn __export_did_tmp_() -> String {
+    use crate::calls::ProfileEntry;
+    use candid::export_service;
+    use catalyze_shared::profile::{Profile, ProfileFilter};
+
+    export_service!();
+    __export_service()
 }
 
 #[init]
@@ -47,17 +57,6 @@ fn extend_shards(_shards: u64) -> CanisterResult<Principals> {
     // TODO: add deploy logic
     shards.append(&mut vec![]);
     Shards::default().set(shards)
-}
-
-// Hacky way to expose the candid interface to the outside world
-#[query(name = "__get_candid_interface_tmp_hack")]
-pub fn __export_did_tmp_() -> String {
-    use crate::{calls::ProfileEntry, models::ProfileFilter};
-    use candid::export_service;
-    use catalyze_shared::profile::Profile;
-
-    export_service!();
-    __export_service()
 }
 
 // Method used to save the candid interface to a file

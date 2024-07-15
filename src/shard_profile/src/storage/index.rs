@@ -1,23 +1,23 @@
 use candid::Principal;
 use common::{CellStorage, StaticCellStorageRef};
 
-use super::state::SHARD_ITER;
+use super::INDEX;
 
-pub struct ShardIter {
+pub struct Index {
     name: String,
     storage: StaticCellStorageRef<Principal>,
 }
 
-impl Default for ShardIter {
+impl Default for Index {
     fn default() -> Self {
         Self {
-            name: "shard_iter".to_owned(),
-            storage: &SHARD_ITER,
+            name: "index".to_owned(),
+            storage: &INDEX,
         }
     }
 }
 
-impl CellStorage<Principal> for ShardIter {
+impl CellStorage<Principal> for Index {
     fn name(&self) -> String {
         self.name.clone()
     }

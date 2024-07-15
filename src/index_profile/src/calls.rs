@@ -1,9 +1,12 @@
 use candid::Principal;
-use catalyze_shared::{profile::Profile, CanisterResult};
-use common::{is_proxy, CellStorage, StorageIndex};
+use catalyze_shared::{
+    profile::{Profile, ProfileFilter},
+    CanisterResult,
+};
+use common::{is_proxy, CellStorage, IndexController};
 use ic_cdk::{query, update};
 
-use crate::{index::ProfileIndex, models::ProfileFilter, storage::Proxies};
+use crate::{index::ProfileIndex, storage::Proxies};
 
 fn is_proxy_guard() -> Result<(), String> {
     is_proxy(Proxies::default().get().expect("Failed to get proxies"))
