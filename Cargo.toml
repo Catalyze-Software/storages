@@ -12,8 +12,7 @@ ic-stable-structures = "0.6"
 async-trait = "0.1"
 futures = "0.3"
 
-# catalyze-shared = { git = "https://github.com/Catalyze-Software/catalyze-shared" }
-catalyze-shared = { path = "../catalyze-shared" }
+catalyze-shared = { git = "https://github.com/Catalyze-Software/catalyze-shared", branch = "feat/storages" }
 
 [profile.release]
 lto = true

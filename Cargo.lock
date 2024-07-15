@@ -113,6 +113,7 @@ dependencies = [
 [[package]]
 name = "catalyze-shared"
 version = "0.1.0"
+source = "git+https://github.com/Catalyze-Software/catalyze-shared?branch=feat/storages#9c68a3eb93a0ac4cce356ce579c7d3d165c039f3"
 dependencies = [
  "candid",
  "email_address",
