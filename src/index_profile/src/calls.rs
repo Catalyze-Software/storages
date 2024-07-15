@@ -1,6 +1,6 @@
 use candid::Principal;
 use catalyze_shared::{
-    profile::{Profile, ProfileFilter},
+    profile::{Profile, ProfileEntry, ProfileFilter},
     CanisterResult,
 };
 use common::{is_proxy, CellStorage, IndexController};
@@ -11,8 +11,6 @@ use crate::{index::ProfileIndex, storage::Proxies};
 fn is_proxy_guard() -> Result<(), String> {
     is_proxy(Proxies::default().get().expect("Failed to get proxies"))
 }
-
-pub type ProfileEntry = (Principal, Profile);
 
 #[query(composite = true, guard = "is_proxy_guard")]
 async fn get(key: Principal) -> CanisterResult<ProfileEntry> {

@@ -12,6 +12,7 @@ futures = { workspace = true }
 
 ic-cdk = { workspace = true }
 ic-stable-structures = { workspace = true }
+ic-ledger-types = { workspace = true }
 
 catalyze-shared = { workspace = true }
 

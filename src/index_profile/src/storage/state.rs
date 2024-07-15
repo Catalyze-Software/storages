@@ -11,8 +11,9 @@ use ic_stable_structures::{
 pub static PROXIES_MEMORY_ID: MemoryId = MemoryId::new(0);
 pub static SHARDS_MEMORY_ID: MemoryId = MemoryId::new(1);
 pub static SHARD_ITER_MEMORY_ID: MemoryId = MemoryId::new(2);
+pub static SHARD_WASM_MEMORY_ID: MemoryId = MemoryId::new(3);
 
-pub static IDS_MEMORY_ID: MemoryId = MemoryId::new(3);
+pub static IDS_MEMORY_ID: MemoryId = MemoryId::new(4);
 
 thread_local! {
     pub static MEMORY_MANAGER: MemoryManagerStorage =
@@ -28,6 +29,10 @@ thread_local! {
 
     pub static SHARD_ITER: CellStorageRef<Principal> = RefCell::new(
         Cell::init(MEMORY_MANAGER.with(|p| p.borrow().get(SHARD_ITER_MEMORY_ID)), None).expect("Failed to initialize shard iter cell")
+    );
+
+    pub static SHARD_WASM: CellStorageRef<Vec<u8>> = RefCell::new(
+        Cell::init(MEMORY_MANAGER.with(|p| p.borrow().get(SHARD_WASM_MEMORY_ID)), None).expect("Failed to initialize shards wasm cell")
     );
 
     pub static IDS: StorageRef<Principal, Principal> = RefCell::new(

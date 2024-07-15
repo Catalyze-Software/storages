@@ -9,7 +9,7 @@ cargo build --workspace --release --target wasm32-unknown-unknown --exclude comm
 mkdir -p wasm
 
 echo "Compressing wasm files..."
-gzip -r `find target/wasm32-unknown-unknown/release -type f -name "*.wasm"`
+gzip -r `find target/wasm32-unknown-unknown/release -type f -name "*.wasm"` -f
 
 echo "Coping gzips..."
 find target/wasm32-unknown-unknown/release -name \*.wasm.gz -exec cp {} wasm \;

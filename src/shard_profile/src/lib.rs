@@ -2,6 +2,7 @@ use common::{queries, CellStorage};
 use ic_cdk::{caller, init, query};
 use storage::Index;
 
+mod calls;
 mod controller;
 mod storage;
 
@@ -18,7 +19,11 @@ fn icts_version() -> String {
 // Hacky way to expose the candid interface to the outside world
 #[query(name = "__get_candid_interface_tmp_hack")]
 pub fn __export_did_tmp_() -> String {
-    use candid::export_service;
+    use candid::{export_service, Principal};
+    use catalyze_shared::{
+        profile::{Profile, ProfileEntry, ProfileFilter},
+        CanisterResult,
+    };
     export_service!();
     __export_service()
 }

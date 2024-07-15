@@ -1,6 +1,126 @@
-service : {
+type ApiError = record {
+  tag : opt text;
+  info : opt vec text;
+  method_name : opt text;
+  message : opt text;
+  timestamp : nat64;
+  error_type : ApiErrorType;
+};
+type ApiErrorType = variant {
+  Duplicate;
+  SerializeError;
+  DeserializeError;
+  NotFound;
+  ValidationError : vec ValidationResponse;
+  Unsupported;
+  Unauthorized;
+  Unexpected;
+  NotImplemented;
+  BadRequest;
+};
+type ApplicationRole = variant {
+  Blocked;
+  Guest;
+  Member;
+  Banned;
+  Admin;
+  Moderator;
+  Leader;
+  Owner;
+  Watcher;
+};
+type Asset = variant { Url : text; None; CanisterStorage : CanisterStorage };
+type CanisterStorage = variant { None; Manifest : Manifest; Chunk : ChunkData };
+type ChunkData = record {
+  chunk_id : nat64;
+  canister : principal;
+  index : nat64;
+};
+type DateRange = record { end_date : nat64; start_date : nat64 };
+type DocumentDetails = record {
+  approved_date : nat64;
+  approved_version : nat64;
+};
+type Manifest = record { entries : vec ChunkData };
+type Profile = record {
+  updated_on : nat64;
+  profile_image : Asset;
+  banner_image : Asset;
+  about : text;
+  country : text;
+  username : text;
+  starred : vec Subject;
+  interests : vec nat32;
+  city : text;
+  created_on : nat64;
+  email : text;
+  website : text;
+  terms_of_service : opt DocumentDetails;
+  display_name : text;
+  extra : text;
+  privacy_policy : opt DocumentDetails;
+  notification_id : opt nat64;
+  pinned : vec Subject;
+  privacy : ProfilePrivacy;
+  wallets : vec record { principal; Wallet };
+  state_or_province : text;
+  first_name : text;
+  last_name : text;
+  causes : vec nat32;
+  code_of_conduct : opt DocumentDetails;
+  date_of_birth : nat64;
+  skills : vec nat32;
+  relations : vec record { principal; text };
+  application_role : ApplicationRole;
+};
+type ProfileFilter = variant {
+  Interest : nat32;
+  Email : text;
+  Skill : nat32;
+  DisplayName : text;
+  UpdatedOn : DateRange;
+  City : text;
+  FirstName : text;
+  LastName : text;
+  Cause : nat32;
+  StateOrProvince : text;
+  Country : text;
+  CreatedOn : DateRange;
+  Username : text;
+};
+type ProfilePrivacy = variant { Private; Public };
+type Result = variant {
+  Ok : vec record { principal; Profile };
+  Err : ApiError;
+};
+type Result_1 = variant {
+  Ok : opt record { principal; Profile };
+  Err : ApiError;
+};
+type Result_2 = variant { Ok : record { principal; Profile }; Err : ApiError };
+type Result_3 = variant { Ok : bool; Err : ApiError };
+type Result_4 = variant { Ok; Err : ApiError };
+type Subject = variant {
+  Event : nat64;
+  Group : nat64;
+  Attendee : principal;
+  None;
+  Member : principal;
+  Profile : principal;
+};
+type ValidationResponse = record { field : text; message : text };
+type Wallet = record { provider : text; is_primary : bool };
+service : () -> {
   __get_candid_interface_tmp_hack : () -> (text) query;
-  greet : (text) -> (text) query;
+  filter : (vec ProfileFilter) -> (Result) query;
+  find : (vec ProfileFilter) -> (Result_1) query;
+  get : (principal) -> (Result_2) query;
+  get_all : () -> (Result) query;
+  get_many : (vec principal) -> (Result) query;
   icts_name : () -> (text) query;
   icts_version : () -> (text) query;
+  insert : (principal, Profile) -> (Result_2);
+  remove : (principal) -> (Result_3);
+  remove_many : (vec principal) -> (Result_4);
+  update : (principal, Profile) -> (Result_2);
 }
