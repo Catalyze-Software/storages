@@ -1,10 +1,10 @@
 echo "Starting build..."
 
 echo "Generating candids"
-cargo test candid --workspace --exclude common
+cargo test candid --workspace --exclude common --exclude tests
 
 echo "Building the canisters..."
-cargo build --workspace --release --target wasm32-unknown-unknown --exclude common
+cargo build --workspace --release --target wasm32-unknown-unknown --exclude common --exclude tests
 
 mkdir -p wasm
 

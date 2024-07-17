@@ -40,6 +40,7 @@ async fn init(proxies: Vec<Principal>) {
         .expect("Failed to set proxies");
 }
 
+// TODO: Add guard dev
 #[update]
 async fn _dev_extend_shards(shards: u64) -> CanisterResult<ShardsIndex> {
     let shard_ids = Shards::default().get().unwrap_or_default();
@@ -58,12 +59,13 @@ async fn _dev_extend_shards(shards: u64) -> CanisterResult<ShardsIndex> {
     Ok(shard_ids)
 }
 
-// TODO: Add guard
+// TODO: Add guard dev
 #[update]
 fn _dev_upload_wasm(wasm: ByteBuf) -> bool {
     ShardWasm::default().set(wasm.into_vec()).is_ok()
 }
 
+// TODO: Add guard dev
 #[update]
 fn _dev_set_shard_filled(shard: Principal, filled: bool) -> CanisterResult<ShardsIndex> {
     let mut shard_ids = Shards::default().get()?.to_vec();
