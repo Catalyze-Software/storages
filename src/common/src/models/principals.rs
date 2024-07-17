@@ -3,7 +3,7 @@ use catalyze_shared::impl_storable_for;
 
 impl_storable_for!(Principals);
 
-#[derive(Clone, Debug, CandidType, Deserialize)]
+#[derive(Clone, Default, Debug, CandidType, Deserialize)]
 pub struct Principals(Vec<Principal>);
 
 impl Principals {

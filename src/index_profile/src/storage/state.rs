@@ -2,7 +2,7 @@ use std::cell::RefCell;
 
 use candid::Principal;
 use catalyze_shared::{MemoryManagerStorage, StorageRef};
-use common::{CellStorageRef, Principals};
+use common::{CellStorageRef, Principals, ShardsIndex};
 use ic_stable_structures::{
     memory_manager::{MemoryId, MemoryManager},
     Cell, DefaultMemoryImpl, StableBTreeMap,
@@ -23,7 +23,7 @@ thread_local! {
         Cell::init(MEMORY_MANAGER.with(|p| p.borrow().get(PROXIES_MEMORY_ID)), None).expect("Failed to initialize proxies cell")
     );
 
-    pub static SHARDS: CellStorageRef<Principals> = RefCell::new(
+    pub static SHARDS: CellStorageRef<ShardsIndex> = RefCell::new(
         Cell::init(MEMORY_MANAGER.with(|p| p.borrow().get(SHARDS_MEMORY_ID)), None).expect("Failed to initialize shards cell")
     );
 

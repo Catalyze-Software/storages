@@ -3,7 +3,7 @@ use catalyze_shared::{
     profile::{Profile, ProfileFilter, ProfileSort},
     Sorter,
 };
-use common::{CellStorage, IDMap, IndexController, Principals, ShardClient};
+use common::{CellStorage, IDMap, IndexController, ShardClient, ShardsIndex};
 
 use crate::storage::{IDs, ShardIter, Shards};
 
@@ -16,7 +16,7 @@ impl ShardClient<Principal, Profile, ProfileFilter> for ProfileShardClient {}
 pub struct ProfileIndex;
 
 impl IndexController<Principal, Profile, ProfileFilter> for ProfileIndex {
-    fn shards(&self) -> impl CellStorage<Principals> {
+    fn shards(&self) -> impl CellStorage<ShardsIndex> {
         Shards::default()
     }
 

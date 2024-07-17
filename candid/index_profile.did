@@ -89,7 +89,7 @@ type ProfileFilter = variant {
   Username : text;
 };
 type ProfilePrivacy = variant { Private; Public };
-type Result = variant { Ok : vec principal; Err : ApiError };
+type Result = variant { Ok : vec Shard; Err : ApiError };
 type Result_1 = variant {
   Ok : vec record { principal; Profile };
   Err : ApiError;
@@ -101,6 +101,7 @@ type Result_2 = variant {
 type Result_3 = variant { Ok : record { principal; Profile }; Err : ApiError };
 type Result_4 = variant { Ok : bool; Err : ApiError };
 type Result_5 = variant { Ok; Err : ApiError };
+type Shard = record { id : principal; filled : bool };
 type Subject = variant {
   Event : nat64;
   Group : nat64;
@@ -111,9 +112,11 @@ type Subject = variant {
 };
 type ValidationResponse = record { field : text; message : text };
 type Wallet = record { provider : text; is_primary : bool };
-service : (blob, vec principal, nat64) -> {
+service : (vec principal) -> {
   __get_candid_interface_tmp_hack : () -> (text) query;
-  extend_shards : (nat64) -> (Result);
+  _dev_extend_shards : (nat64) -> (Result);
+  _dev_set_shard_filled : (principal, bool) -> (Result);
+  _dev_upload_wasm : (blob) -> (bool);
   filter : (vec ProfileFilter) -> (Result_1) composite_query;
   find : (vec ProfileFilter) -> (Result_2) composite_query;
   get : (principal) -> (Result_3) composite_query;

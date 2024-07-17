@@ -1,7 +1,8 @@
 use candid::Principal;
-use catalyze_shared::CanisterResult;
-use common::{queries, spawn_shard, CellStorage, Principals};
+use catalyze_shared::{api_error::ApiError, CanisterResult};
+use common::{queries, spawn_shard, CellStorage, ShardsIndex};
 use ic_cdk::{init, query, trap, update};
+use serde_bytes::ByteBuf;
 use storage::{Proxies, ShardIter, ShardWasm, Shards};
 
 mod calls;
@@ -29,7 +30,7 @@ pub fn __export_did_tmp_() -> String {
 }
 
 #[init]
-async fn init(shard_wasm: Vec<u8>, proxies: Vec<Principal>, shards: u64) {
+async fn init(proxies: Vec<Principal>) {
     if proxies.is_empty() {
         trap("Proxies cannot be empty");
     }
@@ -37,40 +38,47 @@ async fn init(shard_wasm: Vec<u8>, proxies: Vec<Principal>, shards: u64) {
     Proxies::default()
         .set(proxies.into())
         .expect("Failed to set proxies");
-
-    ShardWasm::default()
-        .set(shard_wasm.clone())
-        .expect("Failed to set shard wasm");
-
-    let mut shard_ids = vec![];
-
-    for _ in 0..shards {
-        shard_ids.push(
-            spawn_shard(shard_wasm.clone())
-                .await
-                .expect("Failed to spawn shard"),
-        );
-    }
-
-    Shards::default()
-        .set(shard_ids.clone().into())
-        .expect("Failed to set shards");
-
-    ShardIter::default()
-        .set(shard_ids[0])
-        .expect("Failed to set shard iter");
 }
 
 #[update]
-async fn extend_shards(shards: u64) -> CanisterResult<Principals> {
-    let shard_ids = Shards::default().get()?;
+async fn _dev_extend_shards(shards: u64) -> CanisterResult<ShardsIndex> {
+    let shard_ids = Shards::default().get().unwrap_or_default();
     let shard_wasm = ShardWasm::default().get()?;
     let mut new_shards_list = shard_ids.to_vec();
 
     for _ in 0..shards {
         new_shards_list.push(spawn_shard(shard_wasm.clone()).await?);
     }
-    Shards::default().set(new_shards_list.into())
+    let shard_ids = Shards::default().set(new_shards_list.clone().into())?;
+
+    if ShardIter::default().get().is_err() {
+        ShardIter::default().set(new_shards_list[0].id())?;
+    }
+
+    Ok(shard_ids)
+}
+
+// TODO: Add guard
+#[update]
+fn _dev_upload_wasm(wasm: ByteBuf) -> bool {
+    ShardWasm::default().set(wasm.into_vec()).is_ok()
+}
+
+#[update]
+fn _dev_set_shard_filled(shard: Principal, filled: bool) -> CanisterResult<ShardsIndex> {
+    let mut shard_ids = Shards::default().get()?.to_vec();
+
+    let idx = shard_ids
+        .iter()
+        .position(|s| s.id() == shard)
+        .ok_or_else(|| {
+            ApiError::not_found().add_message(format!("Shard with the id {shard} not found"))
+        })?;
+
+    let shard = shard_ids.get_mut(idx).expect("Shard not found");
+    shard.set_filled(filled);
+
+    Shards::default().set(shard_ids.clone().into())
 }
 
 // Method used to save the candid interface to a file

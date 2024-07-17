@@ -113,7 +113,7 @@ dependencies = [
 [[package]]
 name = "catalyze-shared"
 version = "0.1.0"
-source = "git+https://github.com/Catalyze-Software/catalyze-shared?branch=feat/storages#ab3d02f7e71a55a0a1d2da4ab868142b410c13ad"
+source = "git+https://github.com/Catalyze-Software/catalyze-shared?branch=feat/storages#e105c5d1bfc6f134048bdf26b5d9b4765f689be4"
 dependencies = [
  "candid",
  "email_address",
@@ -145,7 +145,7 @@ dependencies = [
  "candid",
  "catalyze-shared",
  "futures",
- "ic-cdk 0.14.0",
+ "ic-cdk 0.15.0",
  "ic-ledger-types",
  "ic-stable-structures",
  "serde",
@@ -436,9 +436,10 @@ dependencies = [
  "candid",
  "catalyze-shared",
  "common",
- "ic-cdk 0.14.0",
+ "ic-cdk 0.15.0",
  "ic-stable-structures",
  "serde",
+ "serde_bytes",
 ]
 
 [[package]]
@@ -638,7 +639,7 @@ dependencies = [
  "candid",
  "catalyze-shared",
  "common",
- "ic-cdk 0.14.0",
+ "ic-cdk 0.15.0",
  "ic-stable-structures",
 ]
 

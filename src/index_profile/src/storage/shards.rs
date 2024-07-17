@@ -1,10 +1,10 @@
-use common::{CellStorage, Principals, StaticCellStorageRef};
+use common::{CellStorage, ShardsIndex, StaticCellStorageRef};
 
 use super::state::SHARDS;
 
 pub struct Shards {
     name: String,
-    storage: StaticCellStorageRef<Principals>,
+    storage: StaticCellStorageRef<ShardsIndex>,
 }
 
 impl Default for Shards {
@@ -15,12 +15,12 @@ impl Default for Shards {
         }
     }
 }
-impl CellStorage<Principals> for Shards {
+impl CellStorage<ShardsIndex> for Shards {
     fn name(&self) -> String {
         self.name.clone()
     }
 
-    fn storage(&self) -> StaticCellStorageRef<Principals> {
+    fn storage(&self) -> StaticCellStorageRef<ShardsIndex> {
         self.storage
     }
 }

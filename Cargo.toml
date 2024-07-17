@@ -5,8 +5,9 @@ members = ["src/*"]
 [workspace.dependencies]
 candid = "0.10"
 serde = { version = "1", features = ["derive"] }
+serde_bytes = "0.11"
 
-ic-cdk = "0.14"
+ic-cdk = "0.15"
 ic-stable-structures = "0.6"
 ic-ledger-types = "0.12"
 
@@ -14,6 +15,7 @@ async-trait = "0.1"
 futures = "0.3"
 
 catalyze-shared = { git = "https://github.com/Catalyze-Software/catalyze-shared", branch = "feat/storages" }
+
 
 [profile.release]
 lto = true

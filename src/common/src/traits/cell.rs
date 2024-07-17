@@ -15,7 +15,7 @@ pub trait CellStorage<V: Storable + Clone + 'static> {
             .with(|data| data.borrow().get().clone())
             .ok_or_else(|| {
                 ApiError::unexpected()
-                    .add_message(&format!("Failed to get {}, not initialized", self.name()))
+                    .add_message(format!("Failed to get {}, not initialized", self.name()))
             })
     }
 
@@ -23,7 +23,7 @@ pub trait CellStorage<V: Storable + Clone + 'static> {
         self.storage()
             .with(|data| data.borrow_mut().set(Some(value.clone())))
             .map_err(|_| {
-                ApiError::unexpected().add_message(&format!("Failed to set {}", self.name()))
+                ApiError::unexpected().add_message(format!("Failed to set {}", self.name()))
             })?;
         Ok(value)
     }

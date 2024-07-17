@@ -12,7 +12,7 @@ use ic_cdk::{
 };
 use ic_ledger_types::{Tokens, MAINNET_CYCLES_MINTING_CANISTER_ID};
 
-use crate::IcpXdrConversionRateResponse;
+use crate::{IcpXdrConversionRateResponse, Shard};
 
 pub static MIN_CYCLES_FOR_SPINUP: u64 = 5_000_000_000_000;
 pub static CATALYZE_E8S_FEE: Tokens = Tokens::from_e8s(10000000);
@@ -40,6 +40,7 @@ async fn spawn_canister(cycles: u64) -> CanisterResult<Principal> {
             freezing_threshold: None,
             reserved_cycles_limit: None,
             wasm_memory_limit: None,
+            log_visibility: None,
         }),
     };
 
@@ -49,7 +50,7 @@ async fn spawn_canister(cycles: u64) -> CanisterResult<Principal> {
         .map_err(|(_, err)| ApiError::unexpected().add_message(err.as_str()))
 }
 
-pub async fn spawn_shard(wasm_module: Vec<u8>) -> CanisterResult<Principal> {
+pub async fn spawn_shard(wasm_module: Vec<u8>) -> CanisterResult<Shard> {
     let balance = canister_balance();
     let minimum_spawn_icp_amount = get_minimum_spawn_icp_amount().await?;
 
@@ -70,5 +71,5 @@ pub async fn spawn_shard(wasm_module: Vec<u8>) -> CanisterResult<Principal> {
         .await
         .map_err(|(_, err)| ApiError::unexpected().add_message(err.as_str()))?;
 
-    Ok(shard_id)
+    Ok(Shard::new(shard_id))
 }

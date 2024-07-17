@@ -5,7 +5,7 @@ use candid::Principal;
 use catalyze_shared::{api_error::ApiError, CanisterResult, Sorter};
 use ic_stable_structures::Storable;
 
-use crate::{CellStorage, IDMap, Principals, ShardClient};
+use crate::{CellStorage, IDMap, ShardClient, ShardsIndex};
 
 #[async_trait]
 pub trait IndexController<K, V, F>: Send + Sync
@@ -29,7 +29,7 @@ where
     F: 'static + candid::CandidType + Clone + Send + Sync,
 {
     /// Shards storage
-    fn shards(&self) -> impl CellStorage<Principals>;
+    fn shards(&self) -> impl CellStorage<ShardsIndex>;
     /// Shard iterator storage, responsible for round-robin shard selection
     fn shard_iter(&self) -> impl CellStorage<Principal>;
     /// Entry ID to shard mapping storage
@@ -42,14 +42,19 @@ where
     /// Get the next shard in the round-robin sequence
     fn next_shard(&self) -> CanisterResult<Principal> {
         let current = self.shard_iter().get()?;
-        let shards = self.shards().get()?.to_vec();
+        let shards = self
+            .shards()
+            .get()?
+            .to_vec()
+            .into_iter()
+            .filter(|s| !s.filled())
+            .collect::<Vec<_>>();
+
         let current = shards
             .clone()
             .into_iter()
-            .position(|x| x == current)
-            .ok_or_else(|| {
-                ApiError::unexpected().add_message("Failed to find current shard in shards list")
-            })?;
+            .position(|x| x.id() == current)
+            .unwrap_or_default();
 
         let next = if shards.len() == current + 1 {
             0
@@ -57,9 +62,9 @@ where
             current + 1
         };
 
-        self.shard_iter().set(shards[next])?;
+        self.shard_iter().set(shards[next].id())?;
 
-        Ok(shards[current])
+        Ok(shards[current].id())
     }
 
     async fn get(&self, id: K) -> CanisterResult<(K, V)> {
@@ -91,7 +96,7 @@ where
         let shards = self.shards().get()?;
 
         for shard in shards.to_vec().iter() {
-            let values = self.client().get_all(*shard).await?;
+            let values = self.client().get_all(shard.id()).await?;
             res.extend(values);
         }
 
@@ -102,7 +107,7 @@ where
         let shards = self.shards().get()?;
 
         for shard in shards.to_vec().iter() {
-            let value = self.client().find(*shard, filters.clone()).await?;
+            let value = self.client().find(shard.id(), filters.clone()).await?;
             if value.is_some() {
                 return Ok(value);
             }
@@ -117,7 +122,7 @@ where
         let shards = self.shards().get()?;
 
         for shard in shards.to_vec().iter() {
-            let values = self.client().filter(*shard, filters.clone()).await?;
+            let values = self.client().filter(shard.id(), filters.clone()).await?;
             res.extend(values);
         }
 
