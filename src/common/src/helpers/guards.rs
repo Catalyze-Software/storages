@@ -5,9 +5,9 @@ use ic_cdk::caller;
 use crate::Principals;
 
 pub fn is_authorized() -> Result<(), String> {
-    if caller() != Principal::anonymous() {
+    if caller() == Principal::anonymous() {
         return Err(ApiError::unauthorized()
-            .add_message("Unauthorized, caller is not anonymous")
+            .add_message("Unauthorized, caller is anonymous")
             .to_string());
     }
 

@@ -28,7 +28,7 @@ fn default_pem_path() -> String {
     )
 }
 
-pub fn context() -> Context {
+pub async fn context() -> Context {
     let ic_url = std::env::var("IC_URL").unwrap_or_else(|_| "http://localhost:4943".to_string());
     let identity_path = std::env::var("IDENTITY_PATH").unwrap_or_else(|_| default_pem_path());
     let identity_path = Path::new(&identity_path);
@@ -38,12 +38,19 @@ pub fn context() -> Context {
     let index_profile =
         Principal::from_str(&index_profile).expect("Failed to parse index profile principal");
 
+    let agent = ic_agent::Agent::builder()
+        .with_url(ic_url)
+        .with_identity(identity)
+        .build()
+        .expect("Failed to build agent");
+
+    agent
+        .fetch_root_key()
+        .await
+        .expect("Failed to fetch root key for the icp agent");
+
     Context {
         index_profile,
-        agent: ic_agent::Agent::builder()
-            .with_url(ic_url)
-            .with_identity(identity)
-            .build()
-            .expect("Failed to build agent"),
+        agent,
     }
 }

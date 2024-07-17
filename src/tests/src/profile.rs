@@ -12,7 +12,7 @@ use crate::{
 
 #[tokio::test]
 async fn test_insert_profiles() {
-    let ctx = context();
+    let ctx = context().await;
 
     let mut profiles = vec![];
 
