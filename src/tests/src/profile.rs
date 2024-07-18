@@ -1,7 +1,9 @@
 use std::{collections::HashMap, time::SystemTime};
 
 use catalyze_shared::{
-    application_role::ApplicationRole, asset::Asset, profile::Profile,
+    application_role::ApplicationRole,
+    asset::Asset,
+    profile::{Profile, ProfileFilter},
     profile_privacy::ProfilePrivacy,
 };
 
@@ -60,7 +62,7 @@ async fn test_insert_profiles() {
 
     let mut profile_ids = vec![];
 
-    for profile in profiles {
+    for profile in profiles.clone() {
         let now = std::time::Instant::now();
 
         let id = random_principal();
@@ -130,4 +132,84 @@ async fn test_insert_profiles() {
             .collect::<Vec<_>>(),
         now.elapsed()
     );
+
+    println!("Find profile");
+
+    let now = std::time::Instant::now();
+
+    let resp = calls::profile::find(&ctx, vec![ProfileFilter::Username("user_1".to_owned())])
+        .await
+        .expect("Failed to find profile")
+        .expect("Profile not found");
+
+    println!(
+        "Found profile: ID: {}, name: {}, elapsed: {:.2?}\n",
+        resp.0,
+        resp.1.username,
+        now.elapsed()
+    );
+
+    println!("Filter profiles");
+
+    let now = std::time::Instant::now();
+
+    let resp = calls::profile::filter(&ctx, vec![ProfileFilter::Username("user_0".to_owned())])
+        .await
+        .expect("Failed to filter profile");
+
+    println!(
+        "Got filtered profiles: {:#?}, elapsed: {:.2?}",
+        resp.iter()
+            .map(|(id, profile)| (id.to_string(), profile.username.clone()))
+            .collect::<Vec<_>>(),
+        now.elapsed()
+    );
+
+    println!("Update profile");
+
+    let now = std::time::Instant::now();
+
+    let id = profile_ids[0];
+    let mut profile = profiles[0].clone();
+
+    profile.username = "user_0_updated".to_owned();
+
+    let resp = calls::profile::update(&ctx, (id, profile.clone()))
+        .await
+        .expect("Failed to update profile");
+
+    println!(
+        "Updated profile: ID: {}, name: {}, elapsed: {:.2?}\n",
+        resp.0,
+        resp.1.username,
+        now.elapsed()
+    );
+
+    println!("Remove profile");
+
+    let now = std::time::Instant::now();
+
+    let id = profile_ids[0];
+
+    calls::profile::remove(&ctx, id)
+        .await
+        .expect("Failed to remove profile");
+
+    println!(
+        "Removed profile: ID: {}, elapsed: {:.2?}\n",
+        id,
+        now.elapsed()
+    );
+
+    println!("Remove many profiles");
+
+    let now = std::time::Instant::now();
+
+    let ids = &profile_ids[1..3];
+
+    calls::profile::remove_many(&ctx, ids.to_vec())
+        .await
+        .expect("Failed to remove many profiles");
+
+    println!("Removed many profiles, elapsed: {:.2?}", now.elapsed());
 }

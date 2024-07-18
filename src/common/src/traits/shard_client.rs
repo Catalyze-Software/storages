@@ -1,5 +1,6 @@
 use candid::{utils::ArgumentEncoder, CandidType, Principal};
 use catalyze_shared::{api_error::ApiError, CanisterResult};
+
 use serde::Deserialize;
 
 #[derive(CandidType, Deserialize)]
