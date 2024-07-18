@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, time::SystemTime};
 
 use catalyze_shared::{
     application_role::ApplicationRole, asset::Asset, profile::Profile,
@@ -18,6 +18,10 @@ async fn test_insert_profiles() {
 
     for i in 0..10 {
         let name = format!("user_{i}");
+        let now = SystemTime::now()
+            .duration_since(SystemTime::UNIX_EPOCH)
+            .unwrap()
+            .as_secs();
 
         let profile: Profile = Profile {
             username: name.to_string(),
@@ -47,24 +51,83 @@ async fn test_insert_profiles() {
             pinned: vec![],
             relations: HashMap::new(),
             notification_id: None,
-            updated_on: 0,
-            created_on: 0,
+            updated_on: now,
+            created_on: now,
         };
 
         profiles.push(profile);
     }
 
+    let mut profile_ids = vec![];
+
     for profile in profiles {
         let now = std::time::Instant::now();
 
-        let resp = calls::profile::insert(&ctx, (random_principal(), profile.clone()))
+        let id = random_principal();
+
+        let resp = calls::profile::insert(&ctx, (id, profile.clone()))
             .await
             .expect("Failed to insert profile");
 
         println!(
-            "Inserted profile: {:?}, elapsed: {:.2?}",
-            resp,
+            "Inserted profile: ID: {}, name: {} elapsed: {:.2?}",
+            resp.0,
+            resp.1.username,
             now.elapsed()
         );
+
+        let now = std::time::Instant::now();
+
+        println!("Get profile by id: {}, name: {}", resp.0, resp.1.username);
+
+        let resp = calls::profile::get(&ctx, resp.0)
+            .await
+            .expect("Failed to get profile");
+
+        println!(
+            "Got profile: ID: {}, name: {}, elapsed: {:.2?}\n",
+            resp.0,
+            resp.1.username,
+            now.elapsed()
+        );
+
+        profile_ids.push(id);
     }
+
+    let ids = &profile_ids[..3];
+
+    println!(
+        "Get many profiles by id: {:#?}",
+        ids.iter().map(|id| id.to_string()).collect::<Vec<_>>()
+    );
+
+    let now = std::time::Instant::now();
+
+    let resp = calls::profile::get_many(&ctx, ids.to_vec())
+        .await
+        .expect("Failed to get many profiles");
+
+    println!(
+        "Got many profiles: {:#?}, elapsed: {:.2?}\n",
+        resp.iter()
+            .map(|(id, profile)| (id.to_string(), profile.username.clone()))
+            .collect::<Vec<_>>(),
+        now.elapsed()
+    );
+
+    println!("Get all profiles");
+
+    let now = std::time::Instant::now();
+
+    let resp = calls::profile::get_all(&ctx)
+        .await
+        .expect("Failed to get all profiles");
+
+    println!(
+        "Got all profiles: {:#?}, elapsed: {:.2?}",
+        resp.iter()
+            .map(|(id, profile)| (id.to_string(), profile.username.clone()))
+            .collect::<Vec<_>>(),
+        now.elapsed()
+    );
 }
