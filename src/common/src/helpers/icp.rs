@@ -11,6 +11,7 @@ use ic_cdk::{
 use crate::Shard;
 
 pub static MIN_CYCLES_FOR_SPINUP: u64 = 3_000_000_000_000;
+// TODO: Revert uncommented code, and check is it working or not
 // pub static CATALYZE_E8S_FEE: Tokens = Tokens::from_e8s(10000000);
 
 // async fn get_minimum_spawn_icp_amount() -> CanisterResult<u64> {
