@@ -5,7 +5,7 @@ use catalyze_shared::{
     CanisterResult,
 };
 use common::{is_developer, is_proxy, spawn_shard, CellStorage, IndexController, ShardsIndex};
-use ic_cdk::{caller, init, query, trap, update};
+use ic_cdk::{init, query, trap, update};
 use serde_bytes::ByteBuf;
 
 use crate::{
