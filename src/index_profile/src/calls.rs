@@ -4,7 +4,7 @@ use catalyze_shared::{
     profile::{Profile, ProfileEntry, ProfileFilter},
     CanisterResult,
 };
-use common::{is_proxy, spawn_shard, CellStorage, IndexController, ShardsIndex};
+use common::{is_developer, is_proxy, spawn_shard, CellStorage, IndexController, ShardsIndex};
 use ic_cdk::{caller, init, query, trap, update};
 use serde_bytes::ByteBuf;
 
@@ -12,22 +12,6 @@ use crate::{
     index::ProfileIndex,
     storage::{Proxies, ShardIter, ShardWasm, Shards},
 };
-
-fn is_developer() -> Result<(), String> {
-    let developers = [
-        "ledm3-52ncq-rffuv-6ed44-hg5uo-iicyu-pwkzj-syfva-heo4k-p7itq-aqe",
-        // staging/develop
-        "syzio-xu6ca-burmx-4afo2-ojpcw-e75j3-m67o5-s5bes-5vvsv-du3t4-wae",
-    ];
-
-    if !developers.contains(&caller().to_text().as_str()) {
-        return Err(ApiError::unauthorized()
-            .add_message("Unauthorized")
-            .to_string());
-    }
-
-    Ok(())
-}
 
 fn is_proxy_guard() -> Result<(), String> {
     if is_developer().is_ok() {

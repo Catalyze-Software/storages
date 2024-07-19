@@ -3,12 +3,16 @@ use catalyze_shared::{
     profile::{Profile, ProfileEntry, ProfileFilter},
     CanisterResult,
 };
-use common::{is_storage_index, CellStorage, ShardController};
+use common::{is_developer, is_storage_index, CellStorage, ShardController};
 use ic_cdk::{query, update};
 
 use crate::{controller::ProfileController, storage::Index};
 
 fn is_index_guard() -> Result<(), String> {
+    if is_developer().is_ok() {
+        return Ok(());
+    }
+
     is_storage_index(
         Index::default()
             .get()
