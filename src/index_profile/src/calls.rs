@@ -22,7 +22,7 @@ fn is_proxy_guard() -> Result<(), String> {
 }
 
 #[init]
-async fn init(proxies: Vec<Principal>) {
+fn init(proxies: Vec<Principal>) {
     if proxies.is_empty() {
         trap("Proxies cannot be empty");
     }
