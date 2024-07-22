@@ -9,6 +9,10 @@ where
     fn name(&self) -> String;
     fn storage(&self) -> StaticStorageRef<K, V>;
 
+    fn size(&self) -> u64 {
+        self.storage().with(|data| data.borrow().len())
+    }
+
     fn insert_by_key(&self, key: K, value: V) -> CanisterResult<(K, V)> {
         self.storage().with(|data| {
             if data.borrow().contains_key(&key) {
@@ -21,10 +25,6 @@ where
             data.borrow_mut().insert(key.clone(), value.clone());
             Ok((key, value))
         })
-    }
-
-    fn size(&self) -> u64 {
-        self.storage().with(|data| data.borrow().len())
     }
 
     fn get(&self, key: K) -> CanisterResult<(K, V)> {

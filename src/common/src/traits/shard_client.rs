@@ -7,6 +7,13 @@ where
     V: candid::CandidType + for<'a> candid::Deserialize<'a>,
     F: candid::CandidType + Clone,
 {
+    fn size(
+        &self,
+        shard: Principal,
+    ) -> impl std::future::Future<Output = CanisterResult<u64>> + Sync + Send {
+        ic_call(shard, "get", ())
+    }
+
     fn get(
         &self,
         shard: Principal,

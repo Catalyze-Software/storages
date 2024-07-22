@@ -68,6 +68,17 @@ where
         Ok(shards[current].id())
     }
 
+    async fn size(&self) -> CanisterResult<u64> {
+        let mut size = 0;
+        let shards = self.shards().get()?;
+
+        for shard in shards.to_vec().iter() {
+            size += self.client().size(shard.id()).await?;
+        }
+
+        Ok(size)
+    }
+
     async fn get(&self, id: K) -> CanisterResult<(K, V)> {
         let shard = self.ids().shard_by_id(id.clone())?;
         self.client().get(shard, id).await

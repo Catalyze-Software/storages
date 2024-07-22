@@ -73,6 +73,11 @@ fn _dev_set_shard_filled(shard: Principal, filled: bool) -> CanisterResult<Shard
 }
 
 #[query(composite = true, guard = "is_proxy_guard")]
+async fn size() -> CanisterResult<u64> {
+    ProfileIndex.size().await
+}
+
+#[query(composite = true, guard = "is_proxy_guard")]
 async fn get(key: Principal) -> CanisterResult<ProfileEntry> {
     ProfileIndex.get(key).await
 }

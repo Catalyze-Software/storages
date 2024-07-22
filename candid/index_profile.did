@@ -101,6 +101,7 @@ type Result_2 = variant {
 type Result_3 = variant { Ok : record { principal; Profile }; Err : ApiError };
 type Result_4 = variant { Ok : bool; Err : ApiError };
 type Result_5 = variant { Ok; Err : ApiError };
+type Result_6 = variant { Ok : nat64; Err : ApiError };
 type Shard = record { id : principal; filled : bool };
 type Subject = variant {
   Event : nat64;
@@ -127,5 +128,6 @@ service : (vec principal) -> {
   insert : (principal, Profile) -> (Result_3);
   remove : (principal) -> (Result_4);
   remove_many : (vec principal) -> (Result_5);
+  size : () -> (Result_6) composite_query;
   update : (principal, Profile) -> (Result_3);
 }

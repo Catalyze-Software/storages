@@ -11,6 +11,10 @@ where
 {
     fn storage(&self) -> impl ShardStorage<K, V>;
 
+    fn size(&self) -> CanisterResult<u64> {
+        Ok(self.storage().size())
+    }
+
     fn get(&self, id: K) -> CanisterResult<(K, V)> {
         self.storage().get(id)
     }

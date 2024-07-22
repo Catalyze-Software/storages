@@ -21,6 +21,11 @@ fn is_index_guard() -> Result<(), String> {
 }
 
 #[query(guard = "is_index_guard")]
+fn size() -> CanisterResult<u64> {
+    ProfileController.size()
+}
+
+#[query(guard = "is_index_guard")]
 fn get(key: Principal) -> CanisterResult<ProfileEntry> {
     ProfileController.get(key)
 }
