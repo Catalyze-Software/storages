@@ -265,7 +265,7 @@ source = "git+https://github.com/Catalyze-Software/catalyze-shared#e48c115927171
 dependencies = [
  "candid",
  "email_address",
- "ic-cdk 0.14.0",
+ "ic-cdk",
  "ic-stable-structures",
  "icrc-ledger-types",
  "serde",
@@ -293,7 +293,7 @@ dependencies = [
  "candid",
  "catalyze-shared",
  "futures",
- "ic-cdk 0.15.0",
+ "ic-cdk",
  "ic-ledger-types",
  "ic-stable-structures",
  "serde",
@@ -871,20 +871,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ff384f182459bec490a7f50a58bbdf8f7a6934de4dcc259e30c70641bcbcb917"
 dependencies = [
  "candid",
- "ic-cdk-macros 0.14.0",
- "ic0",
- "serde",
- "serde_bytes",
-]
-
-[[package]]
-name = "ic-cdk"
-version = "0.15.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0c44983d6e97135d86132111bae5b86c34c498d96b4f182638bebcc7ac07e03c"
-dependencies = [
- "candid",
- "ic-cdk-macros 0.15.0",
+ "ic-cdk-macros",
  "ic0",
  "serde",
  "serde_bytes",
@@ -895,20 +882,6 @@ name = "ic-cdk-macros"
 version = "0.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "01dc6bc425ec048d6ac4137c7c0f2cfbd6f8b0be8efc568feae2b265f566117c"
-dependencies = [
- "candid",
- "proc-macro2",
- "quote",
- "serde",
- "serde_tokenstream",
- "syn 2.0.71",
-]
-
-[[package]]
-name = "ic-cdk-macros"
-version = "0.15.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3af44fb4ec3a4b18831c9d3303ca8fa2ace846c4022d50cb8df4122635d3782e"
 dependencies = [
  "candid",
  "proc-macro2",
@@ -932,14 +905,14 @@ dependencies = [
 
 [[package]]
 name = "ic-ledger-types"
-version = "0.12.0"
+version = "0.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0fd70c701d11208d5d853c1a908bb143848d89c1951f401413cef9c062642112"
+checksum = "7ff0912dee73950385bb95f083b6f0cd6d87bac6be52b7aecce7ea5d2c043f49"
 dependencies = [
  "candid",
  "crc32fast",
  "hex",
- "ic-cdk 0.15.0",
+ "ic-cdk",
  "serde",
  "serde_bytes",
  "sha2 0.10.8",
@@ -1042,7 +1015,7 @@ dependencies = [
  "candid",
  "catalyze-shared",
  "common",
- "ic-cdk 0.15.0",
+ "ic-cdk",
  "ic-stable-structures",
  "serde",
  "serde_bytes",
@@ -1779,7 +1752,7 @@ dependencies = [
  "candid",
  "catalyze-shared",
  "common",
- "ic-cdk 0.15.0",
+ "ic-cdk",
  "ic-stable-structures",
 ]
 

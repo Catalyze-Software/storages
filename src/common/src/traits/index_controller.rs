@@ -13,6 +13,7 @@ where
     K: 'static
         + candid::CandidType
         + for<'a> candid::Deserialize<'a>
+        + std::hash::Hash
         + Storable
         + Ord
         + Clone
@@ -75,19 +76,33 @@ where
     async fn get_many(&self, ids: Vec<K>) -> CanisterResult<Vec<(K, V)>> {
         let mut res = Vec::new();
 
-        let ids_map = ids.into_iter().try_fold(HashMap::new(), |mut acc, id| {
-            let shard = self.ids().shard_by_id(id.clone())?;
-            let entry: &mut Vec<K> = acc.entry(shard).or_default();
-            entry.push(id);
-            Ok(acc)
-        })?;
+        let ids_map = ids
+            .clone()
+            .into_iter()
+            .try_fold(HashMap::new(), |mut acc, id| {
+                let shard = self.ids().shard_by_id(id.clone())?;
+                let entry: &mut Vec<K> = acc.entry(shard).or_default();
+                entry.push(id);
+                Ok(acc)
+            })?;
 
         for (shard, ids) in ids_map.into_iter() {
             let values = self.client().get_many(shard, ids).await?;
             res.extend(values);
         }
 
-        Ok(self.sorter().sort(res))
+        // Sort result according to the key order
+        let entries_map = res.into_iter().collect::<HashMap<K, V>>();
+
+        Ok(ids
+            .into_iter()
+            .map(|id| {
+                (
+                    id.clone(),
+                    entries_map.get(&id).cloned().expect("Entry not found"),
+                )
+            })
+            .collect())
     }
 
     async fn get_all(&self) -> CanisterResult<Vec<(K, V)>> {

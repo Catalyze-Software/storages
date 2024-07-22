@@ -1,5 +1,5 @@
 use candid::Principal;
-use catalyze_shared::{ic_call, CanisterResult};
+use catalyze_shared::{ic_call::ic_call, CanisterResult};
 
 pub trait ShardClient<K, V, F>: Send + Sync
 where
