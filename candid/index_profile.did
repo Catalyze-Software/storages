@@ -130,4 +130,5 @@ service : (vec principal) -> {
   remove_many : (vec principal) -> (Result_5);
   size : () -> (Result_6) composite_query;
   update : (principal, Profile) -> (Result_3);
+  update_many : (vec record { principal; Profile }) -> (Result_1);
 }

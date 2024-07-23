@@ -61,6 +61,11 @@ fn update(key: Principal, value: Profile) -> CanisterResult<ProfileEntry> {
 }
 
 #[update(guard = "is_index_guard")]
+fn update_many(list: Vec<ProfileEntry>) -> CanisterResult<Vec<ProfileEntry>> {
+    ProfileController.update_many(list)
+}
+
+#[update(guard = "is_index_guard")]
 fn remove(key: Principal) -> CanisterResult<bool> {
     ProfileController.remove(key)
 }

@@ -90,6 +90,12 @@ where
         })
     }
 
+    fn update_many(&self, list: Vec<(K, V)>) -> CanisterResult<Vec<(K, V)>> {
+        list.into_iter()
+            .map(|(key, value)| self.update(key, value))
+            .collect()
+    }
+
     fn remove(&self, key: K) -> bool {
         self.storage()
             .with(|data| data.borrow_mut().remove(&key).is_some())

@@ -47,6 +47,10 @@ where
         self.storage().update(key, value)
     }
 
+    fn update_many(&self, list: Vec<(K, V)>) -> CanisterResult<Vec<(K, V)>> {
+        self.storage().update_many(list)
+    }
+
     fn remove(&self, key: K) -> CanisterResult<bool> {
         Ok(self.storage().remove(key))
     }

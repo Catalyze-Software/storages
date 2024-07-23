@@ -71,6 +71,14 @@ where
         ic_call(shard, "update", (key, value))
     }
 
+    fn update_many(
+        &self,
+        shard: Principal,
+        list: Vec<(K, V)>,
+    ) -> impl std::future::Future<Output = CanisterResult<Vec<(K, V)>>> + Sync + Send {
+        ic_call(shard, "update_many", (list,))
+    }
+
     fn remove(
         &self,
         shard: Principal,

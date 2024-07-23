@@ -113,6 +113,11 @@ async fn update(key: Principal, value: Profile) -> CanisterResult<ProfileEntry> 
 }
 
 #[update(guard = "is_proxy_guard")]
+async fn update_many(list: Vec<ProfileEntry>) -> CanisterResult<Vec<ProfileEntry>> {
+    ProfileIndex.update_many(list).await
+}
+
+#[update(guard = "is_proxy_guard")]
 async fn remove(key: Principal) -> CanisterResult<bool> {
     ProfileIndex.remove(key).await
 }

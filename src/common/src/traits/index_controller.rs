@@ -172,6 +172,41 @@ where
         self.client().update(shard, key, value).await
     }
 
+    async fn update_many(&self, list: Vec<(K, V)>) -> CanisterResult<Vec<(K, V)>> {
+        let list_map = list.clone().into_iter().collect::<HashMap<_, _>>();
+
+        let ids_map = list
+            .clone()
+            .into_iter()
+            .try_fold(HashMap::new(), |mut acc, (id, _)| {
+                let shard = self.ids().shard_by_id(id.clone())?;
+                let entry: &mut Vec<K> = acc.entry(shard).or_default();
+                entry.push(id);
+                Ok(acc)
+            })?;
+
+        let mut result = vec![];
+
+        for (shard, ids) in ids_map.into_iter() {
+            let list = ids
+                .into_iter()
+                .map(|id| (id.clone(), list_map.get(&id).unwrap().clone()))
+                .collect();
+
+            let mut updated = self.client().update_many(shard, list).await?;
+            result.append(&mut updated);
+        }
+
+        // Sort result according to the key order
+        let result_map = result.into_iter().collect::<HashMap<K, V>>();
+        let sorted = list
+            .into_iter()
+            .map(|(id, _)| (id.clone(), result_map.get(&id).unwrap().clone()))
+            .collect();
+
+        Ok(sorted)
+    }
+
     async fn remove(&self, key: K) -> CanisterResult<bool> {
         let shard = self.ids().shard_by_id(key.clone())?;
         self.client().remove(shard, key).await
