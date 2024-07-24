@@ -10,7 +10,11 @@ crate-type = ["cdylib"]
 
 [dependencies]
 candid = { workspace = true }
+serde = { workspace = true }
+serde_bytes = { workspace = true }
+
 ic-cdk = { workspace = true }
+ic-stable-structures = { workspace = true }
 
 catalyze-shared = { workspace = true }
 

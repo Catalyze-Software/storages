@@ -12,6 +12,8 @@ crate-type = ["cdylib"]
 candid = { workspace = true }
 ic-cdk = { workspace = true }
 
+ic-stable-structures = { workspace = true }
+
 catalyze-shared = { workspace = true }
 
 common = { path = "../common" }

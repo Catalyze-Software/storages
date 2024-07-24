@@ -5,4 +5,13 @@ edition = "2021"
 
 [dependencies]
 candid = { workspace = true }
+serde = { workspace = true }
+
+async-trait = { workspace = true }
+futures = { workspace = true }
+
 ic-cdk = { workspace = true }
+ic-stable-structures = { workspace = true }
+ic-ledger-types = { workspace = true }
+
+catalyze-shared = { workspace = true }

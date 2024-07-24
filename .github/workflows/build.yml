@@ -9,7 +9,6 @@ concurrency:
 env:
   RUSTFLAGS: "-D warnings"
   CARGO_TERM_COLOR: always
-  CARGO_BUILD_TARGET: wasm32-unknown-unknown
 
 jobs:
   clippy_check:
@@ -34,4 +33,4 @@ jobs:
         run: cargo clippy
 
       - name: Build
-        run: cargo build --workspace --exclude common
+        run: cargo build --workspace --exclude common --exclude tests --target wasm32-unknown-unknown
