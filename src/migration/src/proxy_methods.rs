@@ -1,5 +1,10 @@
 use candid::Principal;
-use catalyze_shared::{group::Group, profile::Profile};
+use catalyze_shared::{
+    attendee::Attendee, boosted::Boost, event::Event, event_collection::EventCollection,
+    friend_request::FriendRequest, group::Group, member_collection::MemberCollection,
+    notification::Notification, profile::Profile, report::Report,
+    user_notifications::UserNotifications,
+};
 
 use crate::{
     canister_methods::Canister,
@@ -16,28 +21,113 @@ impl ProxyCalls {
         CanisterResult::try_from(response.as_slice())?.into_result()
     }
 
-    pub async fn get_groups(&self) -> eyre::Result<Vec<(u64, Group)>> {
+    pub async fn get_groups() -> eyre::Result<Vec<(u64, Group)>> {
         let response = context().proxy.query("mig_groups_get_all", ()).await?;
         println!("Response: {:?}", response);
         CanisterResult::try_from(response.as_slice())?.into_result()
     }
 
-    // Implement when idexes / shards are ready
-    // mig_groups_get_all
-    // mig_events_get_all
-    // mig_reports_get_all
-    // mig_members_get_all
-    // mig_attendee_get_all
-    // mig_friend_requests_get_all
-    // mig_boosted_get_all
-    // mig_notifications_get_all
-    // mig_user_notifications_get_all
-    // mig_group_members_get_all
-    // mig_event_attendees_get_all
-    // mig_group_events_get_all
-    // mig_tags_get_all
-    // mig_categories_get_all
-    // mig_skills_get_all
+    pub async fn get_events() -> eyre::Result<Vec<(u64, Event)>> {
+        let response = context().proxy.query("mig_events_get_all", ()).await?;
+        println!("Response: {:?}", response);
+        CanisterResult::try_from(response.as_slice())?.into_result()
+    }
+
+    pub async fn get_reports() -> eyre::Result<Vec<(u64, Report)>> {
+        let response = context().proxy.query("mig_reports_get_all", ()).await?;
+        println!("Response: {:?}", response);
+        CanisterResult::try_from(response.as_slice())?.into_result()
+    }
+
+    pub async fn get_members() -> eyre::Result<Vec<(Principal, Report)>> {
+        let response = context().proxy.query("mig_members_get_all", ()).await?;
+        println!("Response: {:?}", response);
+        CanisterResult::try_from(response.as_slice())?.into_result()
+    }
+
+    pub async fn get_attendees() -> eyre::Result<Vec<(Principal, Attendee)>> {
+        let response = context().proxy.query("mig_attendee_get_all", ()).await?;
+        println!("Response: {:?}", response);
+        CanisterResult::try_from(response.as_slice())?.into_result()
+    }
+
+    pub async fn get_friend_requests() -> eyre::Result<Vec<(u64, FriendRequest)>> {
+        let response = context()
+            .proxy
+            .query("mig_friend_requests_get_all", ())
+            .await?;
+        println!("Response: {:?}", response);
+        CanisterResult::try_from(response.as_slice())?.into_result()
+    }
+
+    pub async fn get_boosted() -> eyre::Result<Vec<(u64, Boost)>> {
+        let response = context().proxy.query("mig_boosted_get_all", ()).await?;
+        println!("Response: {:?}", response);
+        CanisterResult::try_from(response.as_slice())?.into_result()
+    }
+
+    pub async fn get_notifications() -> eyre::Result<Vec<(u64, Notification)>> {
+        let response = context()
+            .proxy
+            .query("mig_notifications_get_all", ())
+            .await?;
+        println!("Response: {:?}", response);
+        CanisterResult::try_from(response.as_slice())?.into_result()
+    }
+
+    pub async fn get_user_notifications() -> eyre::Result<Vec<(Principal, UserNotifications)>> {
+        let response = context()
+            .proxy
+            .query("mig_user_notifications_get_all", ())
+            .await?;
+        println!("Response: {:?}", response);
+        CanisterResult::try_from(response.as_slice())?.into_result()
+    }
+
+    pub async fn get_group_members() -> eyre::Result<Vec<(u64, MemberCollection)>> {
+        let response = context()
+            .proxy
+            .query("mig_group_members_get_all", ())
+            .await?;
+        println!("Response: {:?}", response);
+        CanisterResult::try_from(response.as_slice())?.into_result()
+    }
+
+    pub async fn get_event_attendees() -> eyre::Result<Vec<(u64, MemberCollection)>> {
+        let response = context()
+            .proxy
+            .query("mig_event_attendees_get_all", ())
+            .await?;
+        println!("Response: {:?}", response);
+        CanisterResult::try_from(response.as_slice())?.into_result()
+    }
+
+    pub async fn get_group_events() -> eyre::Result<Vec<(u64, EventCollection)>> {
+        let response = context()
+            .proxy
+            .query("mig_group_events_get_all", ())
+            .await?;
+        println!("Response: {:?}", response);
+        CanisterResult::try_from(response.as_slice())?.into_result()
+    }
+
+    pub async fn get_tags() -> eyre::Result<Vec<(u64, String)>> {
+        let response = context().proxy.query("mig_tags_get_all", ()).await?;
+        println!("Response: {:?}", response);
+        CanisterResult::try_from(response.as_slice())?.into_result()
+    }
+
+    pub async fn get_categories() -> eyre::Result<Vec<(u64, String)>> {
+        let response = context().proxy.query("mig_categories_get_all", ()).await?;
+        println!("Response: {:?}", response);
+        CanisterResult::try_from(response.as_slice())?.into_result()
+    }
+
+    pub async fn get_skills() -> eyre::Result<Vec<(u64, String)>> {
+        let response = context().proxy.query("mig_skills_get_all", ()).await?;
+        println!("Response: {:?}", response);
+        CanisterResult::try_from(response.as_slice())?.into_result()
+    }
 }
 
 pub fn proxy_by_environment() -> Canister {

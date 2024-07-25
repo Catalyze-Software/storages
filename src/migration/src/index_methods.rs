@@ -30,8 +30,14 @@ pub fn index_by_environment() -> Indexes {
     match AGENT.1 {
         Environment::Development => Indexes {
             profiles: Canister::new("qj423-uyaaa-aaaap-aho4a-cai"),
-            // temporary principal
+            // temporary principals
             groups: Canister::new(Principal::anonymous().to_string().as_str()),
+            events: Canister::new(Principal::anonymous().to_string().as_str()),
+            members: Canister::new(Principal::anonymous().to_string().as_str()),
+            attendees: Canister::new(Principal::anonymous().to_string().as_str()),
+            notifications: Canister::new(Principal::anonymous().to_string().as_str()),
+            reports: Canister::new(Principal::anonymous().to_string().as_str()),
+            friend_requests: Canister::new(Principal::anonymous().to_string().as_str()),
         },
         Environment::Staging => panic!("Staging not implemented"),
         Environment::Production => panic!("Production not implemented"),
@@ -42,4 +48,10 @@ pub fn index_by_environment() -> Indexes {
 pub struct Indexes {
     pub profiles: Canister,
     pub groups: Canister,
+    pub events: Canister,
+    pub members: Canister,
+    pub attendees: Canister,
+    pub notifications: Canister,
+    pub reports: Canister,
+    pub friend_requests: Canister,
 }
