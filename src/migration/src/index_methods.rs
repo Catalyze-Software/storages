@@ -1,9 +1,11 @@
 use crate::{
     canister_methods::Canister,
+    result::CanisterResult,
     utils::{Environment, AGENT},
 };
 use candid::{CandidType, Principal};
 use eyre::Error;
+use serde::de::DeserializeOwned;
 
 pub struct IndexCalls {
     pub canister: Canister,
@@ -14,8 +16,13 @@ impl IndexCalls {
         Self { canister }
     }
 
-    pub async fn insert<K: CandidType, V: CandidType>(&self, k: K, v: V) -> Result<Vec<u8>, Error> {
-        self.canister.update("insert", (k, v)).await
+    pub async fn insert<K: CandidType + DeserializeOwned, V: CandidType + DeserializeOwned>(
+        &self,
+        k: K,
+        v: V,
+    ) -> eyre::Result<(K, V), Error> {
+        let response = self.canister.update("insert", (k, v)).await?;
+        CanisterResult::try_from(response.as_slice())?.into_result()
     }
 }
 
