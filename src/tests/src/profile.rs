@@ -172,7 +172,7 @@ async fn test_insert_profiles() {
     let id = profile_ids[0];
     let mut profile = profiles[0].clone();
 
-    profile.username = "user_0_updated".to_owned();
+    profile.username = String::from("user_0_updated");
 
     let resp = calls::profile::update(&ctx, (id, profile.clone()))
         .await

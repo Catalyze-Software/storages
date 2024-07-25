@@ -1,29 +1,21 @@
-use std::future::Future;
-
 use crate::{
     canister_methods::Canister,
-    utils::{context, Environment, AGENT},
+    utils::{Environment, AGENT},
 };
 use candid::{CandidType, Principal};
-use catalyze_shared::{group::Group, profile::Profile};
 use eyre::Error;
 
-pub trait IndexCallsTrait<K: CandidType, V: CandidType> {
-    fn insert(k: K, v: V) -> impl Future<Output = Result<Vec<u8>, Error>> + Send;
+pub struct IndexCalls {
+    pub canister: Canister,
 }
 
-pub struct ProfileIndexCalls;
-pub struct GroupIndexCalls;
-
-impl IndexCallsTrait<Principal, Profile> for ProfileIndexCalls {
-    async fn insert(k: Principal, v: Profile) -> Result<Vec<u8>, Error> {
-        context().indexes.profiles.update("insert", (k, v)).await
+impl IndexCalls {
+    pub fn new(canister: Canister) -> Self {
+        Self { canister }
     }
-}
 
-impl IndexCallsTrait<u64, Group> for GroupIndexCalls {
-    async fn insert(k: u64, v: Group) -> Result<Vec<u8>, Error> {
-        context().indexes.groups.update("insert", (k, v)).await
+    pub async fn insert<K: CandidType, V: CandidType>(&self, k: K, v: V) -> Result<Vec<u8>, Error> {
+        self.canister.update("insert", (k, v)).await
     }
 }
 

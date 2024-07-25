@@ -1,8 +1,9 @@
-use candid::{Decode, Principal};
+use candid::Principal;
 use catalyze_shared::{group::Group, profile::Profile};
 
 use crate::{
     canister_methods::Canister,
+    result::CanisterResult,
     utils::{context, Environment, AGENT},
 };
 
@@ -12,15 +13,13 @@ impl ProxyCalls {
     pub async fn get_profiles() -> eyre::Result<Vec<(Principal, Profile)>> {
         let response = context().proxy.query("mig_profiles_get_all", ()).await?;
         println!("Response: {:?}", response);
-        Ok(Decode!(&response, Vec<(Principal, Profile)>)
-            .expect("Failed to decode mig_profiles_get_all response"))
+        CanisterResult::try_from(response.as_slice())?.into_result()
     }
 
     pub async fn get_groups(&self) -> eyre::Result<Vec<(u64, Group)>> {
         let response = context().proxy.query("mig_groups_get_all", ()).await?;
         println!("Response: {:?}", response);
-        Ok(Decode!(&response, Vec<(u64, Group)>)
-            .expect("Failed to decode mig_groups_get_all response"))
+        CanisterResult::try_from(response.as_slice())?.into_result()
     }
 
     // Implement when idexes / shards are ready
