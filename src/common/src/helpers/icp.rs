@@ -37,6 +37,7 @@ async fn spawn_canister(cycles: u64) -> CanisterResult<Principal> {
             freezing_threshold: None,
             reserved_cycles_limit: None,
             wasm_memory_limit: None,
+            log_visibility: None,
         }),
     };
 
