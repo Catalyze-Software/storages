@@ -1,52 +1,38 @@
-use crate::utils::{Environment, AGENT};
-use candid::Principal;
-use eyre::Context as _;
+use std::future::Future;
 
-pub struct Canister {
-    principal: Principal,
+use crate::{
+    canister_methods::Canister,
+    utils::{context, Environment, AGENT},
+};
+use candid::{CandidType, Principal};
+use catalyze_shared::{group::Group, profile::Profile};
+use eyre::Error;
+
+pub trait IndexCallsTrait<K: CandidType, V: CandidType> {
+    fn insert(k: K, v: V) -> impl Future<Output = Result<Vec<u8>, Error>> + Send;
 }
 
-impl Canister {
-    pub fn new(principal: &str) -> Self {
-        Self {
-            principal: Principal::from_text(principal).expect("Failed to parse principal"),
-        }
-    }
+pub struct ProfileIndexCalls;
+pub struct GroupIndexCalls;
 
-    pub async fn query(&self, method: &str, args: Option<Vec<u8>>) -> eyre::Result<Vec<u8>> {
-        let mut query = AGENT.query(&self.principal, method);
-
-        if let Some(args) = args {
-            query = query.with_arg(args);
-        }
-
-        let response = query
-            .await
-            .wrap_err_with(|| format!("Failed to perform query \"{}\" request", method))?;
-
-        Ok(response)
-    }
-
-    pub async fn update(&self, method: &str, args: Option<Vec<u8>>) -> eyre::Result<Vec<u8>> {
-        let mut update = AGENT.update(&self.principal, method);
-
-        if let Some(args) = args {
-            update = update.with_arg(args);
-        }
-
-        let response = update
-            .await
-            .wrap_err_with(|| format!("Failed to perform query \"{}\" request", method))?;
-
-        Ok(response)
+impl IndexCallsTrait<Principal, Profile> for ProfileIndexCalls {
+    async fn insert(k: Principal, v: Profile) -> Result<Vec<u8>, Error> {
+        context().indexes.profiles.update("insert", (k, v)).await
     }
 }
 
-pub fn index_by_environment(env: &Environment) -> Indexes {
-    match env {
+impl IndexCallsTrait<u64, Group> for GroupIndexCalls {
+    async fn insert(k: u64, v: Group) -> Result<Vec<u8>, Error> {
+        context().indexes.groups.update("insert", (k, v)).await
+    }
+}
+
+pub fn index_by_environment() -> Indexes {
+    match AGENT.1 {
         Environment::Development => Indexes {
             profiles: Canister::new("qj423-uyaaa-aaaap-aho4a-cai"),
-            groups: Canister::new("random"),
+            // temporary principal
+            groups: Canister::new(Principal::anonymous().to_string().as_str()),
         },
         Environment::Staging => panic!("Staging not implemented"),
         Environment::Production => panic!("Production not implemented"),

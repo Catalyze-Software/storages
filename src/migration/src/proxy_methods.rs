@@ -1,23 +1,26 @@
-use candid::Decode;
-use catalyze_shared::profile::ProfileEntry;
+use candid::{Decode, Principal};
+use catalyze_shared::{group::Group, profile::Profile};
 
 use crate::{
-    index_methods::Canister,
-    utils::{context, Context, Environment},
+    canister_methods::Canister,
+    utils::{context, Environment, AGENT},
 };
 
-pub struct Proxy(Context);
+pub struct ProxyCalls;
 
-impl Proxy {
-    pub fn new(env: Environment) -> Self {
-        Self(context(env))
+impl ProxyCalls {
+    pub async fn get_profiles() -> eyre::Result<Vec<(Principal, Profile)>> {
+        let response = context().proxy.query("mig_profiles_get_all", ()).await?;
+        println!("Response: {:?}", response);
+        Ok(Decode!(&response, Vec<(Principal, Profile)>)
+            .expect("Failed to decode mig_profiles_get_all response"))
     }
 
-    pub async fn get_profiles(&self) -> eyre::Result<Vec<ProfileEntry>> {
-        let ctx = &self.0;
-        let response: Vec<u8> = ctx.proxy.query("mig_profiles_get_all", None).await?;
-        Ok(Decode!(&response, Vec<ProfileEntry>)
-            .expect("Failed to decode mig_profiles_get_all response"))
+    pub async fn get_groups(&self) -> eyre::Result<Vec<(u64, Group)>> {
+        let response = context().proxy.query("mig_groups_get_all", ()).await?;
+        println!("Response: {:?}", response);
+        Ok(Decode!(&response, Vec<(u64, Group)>)
+            .expect("Failed to decode mig_groups_get_all response"))
     }
 
     // Implement when idexes / shards are ready
@@ -38,8 +41,8 @@ impl Proxy {
     // mig_skills_get_all
 }
 
-pub fn proxy_by_environment(env: &Environment) -> Canister {
-    match env {
+pub fn proxy_by_environment() -> Canister {
+    match AGENT.1 {
         Environment::Development => Canister::new("bwm3m-wyaaa-aaaag-qdiua-cai"),
         Environment::Staging => panic!("Staging not implemented"),
         Environment::Production => panic!("Production not implemented"),

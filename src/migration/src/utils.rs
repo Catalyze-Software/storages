@@ -4,7 +4,8 @@ use std::sync::Arc;
 use ic_agent::{identity::BasicIdentity, Agent};
 
 use crate::{
-    index_methods::{index_by_environment, Canister, Indexes},
+    canister_methods::Canister,
+    index_methods::{index_by_environment, Indexes},
     proxy_methods::proxy_by_environment,
 };
 
@@ -20,7 +21,7 @@ pub enum Environment {
 }
 
 lazy_static! {
-    pub static ref AGENT: Arc<Agent> = {
+    pub static ref AGENT: Arc<(Agent, Environment)> = {
         let environment: Environment = match std::env::var("ENV") {
             Ok(env) => match env.as_str() {
                 "development" => Environment::Development,
@@ -30,23 +31,23 @@ lazy_static! {
             },
             Err(_) => panic!("No environment set"),
         };
-        let ic_url = "https://icp0.io";
+        let ic_url = "https://icp0.io/";
         let identity_path = default_pem_path(&environment); // Default to development
         let identity = BasicIdentity::from_pem_file(identity_path).expect("Failed to get identity");
 
-        Arc::new(
-            Agent::builder()
-                .with_url(ic_url)
-                .with_identity(identity)
-                .build()
-                .expect("Failed to build agent"),
+        let agent = Agent::builder()
+            .with_url(ic_url)
+            .with_identity(identity)
+            .build()
+            .expect("Failed to build agent");
+
+        Arc::new((
+            agent,
+            environment)
         )
 
         // here for reference and local testing
-        // agent
-        //     .fetch_root_key()
-        //     .await
-        //     .expect("Failed to fetch root key for the icp agent");
+
     };
 }
 
@@ -69,9 +70,9 @@ fn default_pem_path(env: &Environment) -> String {
     }
 }
 
-pub fn context(env: Environment) -> Context {
+pub fn context() -> Context {
     Context {
-        indexes: index_by_environment(&env),
-        proxy: proxy_by_environment(&env),
+        indexes: index_by_environment(),
+        proxy: proxy_by_environment(),
     }
 }

@@ -3,11 +3,15 @@ name = "migration"
 version = "0.1.0"
 edition = "2021"
 
+[lib]
+crate-type = ["lib"]
+
 [dependencies]
 eyre = "0.6"
 ic-agent = "0.37"
 rand = "0.8"
 elliptic-curve = { version = "0.13" }
+async_once = "0.2.6"
 tokio = { version = "1.38.1", features = ["full"] }
 lazy_static = "1.4.0"
 
