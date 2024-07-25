@@ -44,9 +44,9 @@ impl ProxyCalls {
 pub fn proxy_by_environment() -> Canister {
     match AGENT.1 {
         Environment::Development => Canister::new("bwm3m-wyaaa-aaaag-qdiua-cai"),
-        Environment::Staging => panic!("Staging not implemented"),
-        Environment::Production => panic!("Production not implemented"),
         // Environment::Staging => Principal::from_text("24swh-4iaaa-aaaap-ahevq-cai").unwrap(),
+        Environment::Staging => panic!("Staging not implemented"),
         // Environment::Production => Principal::from_text("2jvhk-5aaaa-aaaap-ahewa-cai").unwrap(),
+        Environment::Production => panic!("Production not implemented"),
     }
 }

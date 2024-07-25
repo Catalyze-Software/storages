@@ -32,7 +32,15 @@ lazy_static! {
             Err(_) => panic!("No environment set"),
         };
         let ic_url = "https://icp0.io/";
-        let identity_path = default_pem_path(&environment); // Default to development
+        let home_dir = std::env::var("HOME").expect("HOME environment variable is not set");
+
+        // development / staging / production
+        let identity_path = format!(
+            "{}/.config/dfx/identity/catalyze_{}/identity.pem",
+            home_dir,
+            std::env::var("ENV").expect("ENV environment variable is not set")
+        );
+
         let identity = BasicIdentity::from_pem_file(identity_path).expect("Failed to get identity");
 
         let agent = Agent::builder()
@@ -49,25 +57,6 @@ lazy_static! {
         // here for reference and local testing
 
     };
-}
-
-fn default_pem_path(env: &Environment) -> String {
-    let home_dir = std::env::var("HOME").expect("HOME environment variable is not set");
-
-    match env {
-        Environment::Development => format!(
-            "{}/.config/dfx/identity/catalyze_development/identity.pem",
-            home_dir
-        ),
-        Environment::Staging => format!(
-            "{}/.config/dfx/identity/catalyze_staging/identity.pem",
-            home_dir
-        ),
-        Environment::Production => format!(
-            "{}/.config/dfx/identity/catalyze_production/identity.pem",
-            home_dir
-        ),
-    }
 }
 
 pub fn context() -> Context {

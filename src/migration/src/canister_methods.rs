@@ -14,24 +14,20 @@ impl Canister {
     }
 
     pub async fn query<T: CandidType>(&self, method: &str, args: T) -> eyre::Result<Vec<u8>> {
-        let response = AGENT
+        AGENT
             .0
             .query(&self.principal, method)
             .with_arg(Encode!(&args)?)
             .await
-            .wrap_err_with(|| format!("Failed to perform query \"{}\" request", method))?;
-
-        Ok(response)
+            .wrap_err_with(|| format!("Failed to perform query \"{}\" request", method))
     }
 
     pub async fn update<T: CandidType>(&self, method: &str, args: T) -> eyre::Result<Vec<u8>> {
-        let response = AGENT
+        AGENT
             .0
             .update(&self.principal, method)
             .with_arg(Encode!(&args)?)
             .await
-            .wrap_err_with(|| format!("Failed to perform query \"{}\" request", method))?;
-
-        Ok(response)
+            .wrap_err_with(|| format!("Failed to perform query \"{}\" request", method))
     }
 }
