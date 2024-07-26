@@ -1,6 +1,7 @@
 use crate::utils::AGENT;
 use candid::{CandidType, Encode, Principal};
 use eyre::Context as _;
+use serde::de::DeserializeOwned;
 
 pub struct Canister {
     principal: Principal,
@@ -13,7 +14,11 @@ impl Canister {
         }
     }
 
-    pub async fn query<T: CandidType>(&self, method: &str, args: T) -> eyre::Result<Vec<u8>> {
+    pub async fn query<T: CandidType + DeserializeOwned>(
+        &self,
+        method: &str,
+        args: T,
+    ) -> eyre::Result<Vec<u8>> {
         AGENT
             .0
             .query(&self.principal, method)
