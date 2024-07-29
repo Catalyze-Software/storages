@@ -1759,6 +1759,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "shard_group"
+version = "0.1.0"
+dependencies = [
+ "candid",
+ "catalyze-shared",
+ "common",
+ "ic-cdk",
+ "ic-stable-structures",
+]
+
+[[package]]
 name = "shard_profile"
 version = "0.1.0"
 dependencies = [
