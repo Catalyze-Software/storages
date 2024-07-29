@@ -261,7 +261,7 @@ dependencies = [
 [[package]]
 name = "catalyze-shared"
 version = "0.1.0"
-source = "git+https://github.com/Catalyze-Software/catalyze-shared#2395dfad40e3e58ddce796d2193da582781e9bee"
+source = "git+https://github.com/Catalyze-Software/catalyze-shared#dfa7e38651bb9c05eb24310c67d2c3044159fe13"
 dependencies = [
  "candid",
  "email_address",
@@ -1007,6 +1007,19 @@ name = "indenter"
 version = "0.3.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ce23b50ad8242c51a442f3ff322d56b02f08852c77e4c0b4d3fd684abc89c683"
+
+[[package]]
+name = "index_event"
+version = "0.1.0"
+dependencies = [
+ "candid",
+ "catalyze-shared",
+ "common",
+ "ic-cdk",
+ "ic-stable-structures",
+ "serde",
+ "serde_bytes",
+]
 
 [[package]]
 name = "index_group"
