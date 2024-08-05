@@ -261,7 +261,7 @@ dependencies = [
 [[package]]
 name = "catalyze-shared"
 version = "0.1.0"
-source = "git+https://github.com/Catalyze-Software/catalyze-shared#42f0256aeb80e18218120b2ccb2f1b0c6cda7dfa"
+source = "git+https://github.com/Catalyze-Software/catalyze-shared#2395dfad40e3e58ddce796d2193da582781e9bee"
 dependencies = [
  "candid",
  "email_address",
@@ -866,9 +866,9 @@ dependencies = [
 
 [[package]]
 name = "ic-cdk"
-version = "0.14.0"
+version = "0.15.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ff384f182459bec490a7f50a58bbdf8f7a6934de4dcc259e30c70641bcbcb917"
+checksum = "0c44983d6e97135d86132111bae5b86c34c498d96b4f182638bebcc7ac07e03c"
 dependencies = [
  "candid",
  "ic-cdk-macros",
@@ -879,9 +879,9 @@ dependencies = [
 
 [[package]]
 name = "ic-cdk-macros"
-version = "0.14.0"
+version = "0.15.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "01dc6bc425ec048d6ac4137c7c0f2cfbd6f8b0be8efc568feae2b265f566117c"
+checksum = "3af44fb4ec3a4b18831c9d3303ca8fa2ace846c4022d50cb8df4122635d3782e"
 dependencies = [
  "candid",
  "proc-macro2",
@@ -905,9 +905,9 @@ dependencies = [
 
 [[package]]
 name = "ic-ledger-types"
-version = "0.11.0"
+version = "0.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7ff0912dee73950385bb95f083b6f0cd6d87bac6be52b7aecce7ea5d2c043f49"
+checksum = "0fd70c701d11208d5d853c1a908bb143848d89c1951f401413cef9c062642112"
 dependencies = [
  "candid",
  "crc32fast",
@@ -1007,6 +1007,19 @@ name = "indenter"
 version = "0.3.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ce23b50ad8242c51a442f3ff322d56b02f08852c77e4c0b4d3fd684abc89c683"
+
+[[package]]
+name = "index_group"
+version = "0.1.0"
+dependencies = [
+ "candid",
+ "catalyze-shared",
+ "common",
+ "ic-cdk",
+ "ic-stable-structures",
+ "serde",
+ "serde_bytes",
+]
 
 [[package]]
 name = "index_profile"
@@ -1743,6 +1756,17 @@ dependencies = [
  "cfg-if",
  "cpufeatures",
  "digest 0.10.7",
+]
+
+[[package]]
+name = "shard_group"
+version = "0.1.0"
+dependencies = [
+ "candid",
+ "catalyze-shared",
+ "common",
+ "ic-cdk",
+ "ic-stable-structures",
 ]
 
 [[package]]
