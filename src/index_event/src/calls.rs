@@ -4,13 +4,16 @@ use catalyze_shared::{
     event::{Event, EventEntry, EventFilter},
     CanisterResult,
 };
-use common::{is_developer, is_proxy, spawn_shard, CellStorage, IndexController, ShardsIndex};
+use common::{
+    controller, is_developer, is_proxy, spawn_shard, CellStorage, IDIter, IndexController,
+    ShardsIndex,
+};
 use ic_cdk::{init, query, trap, update};
 use serde_bytes::ByteBuf;
 
 use crate::{
     index::EventIndex,
-    storage::{Proxies, ShardIter, ShardWasm, Shards},
+    storage::{IDIterator, Proxies, ShardIter, ShardWasm, Shards},
 };
 
 fn is_proxy_guard() -> Result<(), String> {
@@ -103,8 +106,15 @@ async fn filter(filters: Vec<EventFilter>) -> CanisterResult<Vec<EventEntry>> {
 }
 
 #[update(guard = "is_proxy_guard")]
-async fn insert(key: u64, value: Event) -> CanisterResult<EventEntry> {
+async fn insert(value: Event) -> CanisterResult<EventEntry> {
+    let key = IDIterator::default().next()?;
     EventIndex.insert(key, value).await
+}
+
+// TODO: Implement a migration guard for this method
+#[update(guard = "is_proxy_guard")]
+async fn insert_by_key(key: u64, value: Event) -> CanisterResult<EventEntry> {
+    controller::insert_by_key(EventIndex, IDIterator::default(), key, value).await
 }
 
 #[update(guard = "is_proxy_guard")]
