@@ -1048,6 +1048,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "index_report"
+version = "0.1.0"
+dependencies = [
+ "candid",
+ "catalyze-shared",
+ "common",
+ "ic-cdk",
+ "ic-stable-structures",
+ "serde",
+ "serde_bytes",
+]
+
+[[package]]
 name = "instant"
 version = "0.1.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1795,6 +1808,17 @@ dependencies = [
 
 [[package]]
 name = "shard_profile"
+version = "0.1.0"
+dependencies = [
+ "candid",
+ "catalyze-shared",
+ "common",
+ "ic-cdk",
+ "ic-stable-structures",
+]
+
+[[package]]
+name = "shard_report"
 version = "0.1.0"
 dependencies = [
  "candid",
