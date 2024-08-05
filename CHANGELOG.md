@@ -11,3 +11,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Profile index and shard implementations
 - Group index and shard implementations
+- Event index and shard implementations
+- Report index and shard implementations
