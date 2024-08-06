@@ -4,13 +4,16 @@ use catalyze_shared::{
     group::{Group, GroupEntry, GroupFilter},
     CanisterResult,
 };
-use common::{is_developer, is_proxy, spawn_shard, CellStorage, IndexController, ShardsIndex};
+use common::{
+    controller, is_developer, is_migration, is_proxy, spawn_shard, CellStorage, IDIter,
+    IndexController, ShardsIndex,
+};
 use ic_cdk::{init, query, trap, update};
 use serde_bytes::ByteBuf;
 
 use crate::{
     index::GroupIndex,
-    storage::{Proxies, ShardIter, ShardWasm, Shards},
+    storage::{IDIterator, Proxies, ShardIter, ShardWasm, Shards},
 };
 
 fn is_proxy_guard() -> Result<(), String> {
@@ -103,8 +106,14 @@ async fn filter(filters: Vec<GroupFilter>) -> CanisterResult<Vec<GroupEntry>> {
 }
 
 #[update(guard = "is_proxy_guard")]
-async fn insert(key: u64, value: Group) -> CanisterResult<GroupEntry> {
+async fn insert(value: Group) -> CanisterResult<GroupEntry> {
+    let key = IDIterator::default().next()?;
     GroupIndex.insert(key, value).await
+}
+
+#[update(guard = "is_migration")]
+async fn insert_by_key(key: u64, value: Group) -> CanisterResult<GroupEntry> {
+    controller::insert_by_key(GroupIndex, IDIterator::default(), key, value).await
 }
 
 #[update(guard = "is_proxy_guard")]
