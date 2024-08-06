@@ -5,8 +5,8 @@ use catalyze_shared::{
     CanisterResult,
 };
 use common::{
-    controller, is_developer, is_proxy, spawn_shard, CellStorage, IDIter, IndexController,
-    ShardsIndex,
+    controller, is_developer, is_migration, is_proxy, spawn_shard, CellStorage, IDIter,
+    IndexController, ShardsIndex,
 };
 use ic_cdk::{init, query, trap, update};
 use serde_bytes::ByteBuf;
@@ -111,8 +111,7 @@ async fn insert(value: Group) -> CanisterResult<GroupEntry> {
     GroupIndex.insert(key, value).await
 }
 
-// TODO: Implement a migration guard for this method
-#[update(guard = "is_proxy_guard")]
+#[update(guard = "is_migration")]
 async fn insert_by_key(key: u64, value: Group) -> CanisterResult<GroupEntry> {
     controller::insert_by_key(GroupIndex, IDIterator::default(), key, value).await
 }
