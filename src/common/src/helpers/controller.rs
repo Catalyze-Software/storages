@@ -25,10 +25,16 @@ where
             .add_info(key.to_string().as_str()));
     }
 
-    iterator.set(key)?;
+    let mut key = key;
+    let current_key = iterator.get()?;
 
-    let key = iterator.next()?;
-    let entry = controller.insert(key, value).await?;
+    // During the migration process, we need to ensure that the keys are inserted in order.
+    // If the key is greater or equals to the current key, we need to update the iterator, thus
+    // ensuring that the next key is greater than the current key.
+    if key >= current_key {
+        iterator.set(key)?;
+        key = iterator.next()?;
+    }
 
-    Ok(entry)
+    controller.insert(key, value).await
 }
