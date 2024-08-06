@@ -1,8 +1,5 @@
 use candid::Principal;
-use catalyze_shared::{
-    event::{Event, EventFilter, EventSort},
-    Sorter,
-};
+use catalyze_shared::event::{Event, EventFilter, EventSort};
 use common::{CellStorage, IDMap, IndexController, ShardClient, ShardsIndex};
 
 use crate::storage::{IDs, ShardIter, Shards};
@@ -15,7 +12,7 @@ impl ShardClient<u64, Event, EventFilter> for EventShardClient {}
 #[derive(Default)]
 pub struct EventIndex;
 
-impl IndexController<u64, Event, EventFilter> for EventIndex {
+impl IndexController<u64, Event, EventFilter, EventSort> for EventIndex {
     fn shards(&self) -> impl CellStorage<ShardsIndex> {
         Shards::default()
     }
@@ -30,9 +27,5 @@ impl IndexController<u64, Event, EventFilter> for EventIndex {
 
     fn client(&self) -> impl ShardClient<u64, Event, EventFilter> {
         EventShardClient
-    }
-
-    fn sorter(&self) -> impl Sorter<u64, Event> {
-        EventSort::default()
     }
 }

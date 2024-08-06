@@ -1,8 +1,5 @@
 use candid::Principal;
-use catalyze_shared::{
-    report::{Report, ReportFilter, ReportSort},
-    Sorter,
-};
+use catalyze_shared::report::{Report, ReportFilter, ReportSort};
 use common::{CellStorage, IDMap, IndexController, ShardClient, ShardsIndex};
 
 use crate::storage::{IDs, ShardIter, Shards};
@@ -15,7 +12,7 @@ impl ShardClient<u64, Report, ReportFilter> for ReportShardClient {}
 #[derive(Default)]
 pub struct ReportIndex;
 
-impl IndexController<u64, Report, ReportFilter> for ReportIndex {
+impl IndexController<u64, Report, ReportFilter, ReportSort> for ReportIndex {
     fn shards(&self) -> impl CellStorage<ShardsIndex> {
         Shards::default()
     }
@@ -30,9 +27,5 @@ impl IndexController<u64, Report, ReportFilter> for ReportIndex {
 
     fn client(&self) -> impl ShardClient<u64, Report, ReportFilter> {
         ReportShardClient
-    }
-
-    fn sorter(&self) -> impl Sorter<u64, Report> {
-        ReportSort::default()
     }
 }

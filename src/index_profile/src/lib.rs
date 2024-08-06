@@ -22,7 +22,10 @@ fn icts_version() -> String {
 #[query(name = "__get_candid_interface_tmp_hack")]
 pub fn __export_did_tmp_() -> String {
     use candid::export_service;
-    use catalyze_shared::profile::{Profile, ProfileEntry, ProfileFilter};
+    use catalyze_shared::{
+        paged_response::PagedResponse,
+        profile::{Profile, ProfileEntry, ProfileFilter, ProfileSort},
+    };
 
     export_service!();
     __export_service()

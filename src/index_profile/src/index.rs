@@ -1,8 +1,5 @@
 use candid::Principal;
-use catalyze_shared::{
-    profile::{Profile, ProfileFilter, ProfileSort},
-    Sorter,
-};
+use catalyze_shared::profile::{Profile, ProfileFilter, ProfileSort};
 use common::{CellStorage, IDMap, IndexController, ShardClient, ShardsIndex};
 
 use crate::storage::{IDs, ShardIter, Shards};
@@ -15,7 +12,7 @@ impl ShardClient<Principal, Profile, ProfileFilter> for ProfileShardClient {}
 #[derive(Default)]
 pub struct ProfileIndex;
 
-impl IndexController<Principal, Profile, ProfileFilter> for ProfileIndex {
+impl IndexController<Principal, Profile, ProfileFilter, ProfileSort> for ProfileIndex {
     fn shards(&self) -> impl CellStorage<ShardsIndex> {
         Shards::default()
     }
@@ -30,9 +27,5 @@ impl IndexController<Principal, Profile, ProfileFilter> for ProfileIndex {
 
     fn client(&self) -> impl ShardClient<Principal, Profile, ProfileFilter> {
         ProfileShardClient
-    }
-
-    fn sorter(&self) -> impl Sorter<Principal, Profile> {
-        ProfileSort::default()
     }
 }
