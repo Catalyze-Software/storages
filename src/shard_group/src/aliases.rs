@@ -1,7 +1,7 @@
 use catalyze_shared::group_with_members::{GroupEntry, GroupFilter, GroupSort, GroupWithMembers};
 
 #[allow(dead_code)]
-pub const CANDID_PATH: &str = "shard_group";
+pub const DATA_KIND: &str = "shard_group";
 
 pub type Key = u64;
 pub type Value = GroupWithMembers;

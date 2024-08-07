@@ -1,0 +1,144 @@
+type Address = record {
+  street : text;
+  country : text;
+  city : text;
+  postal_code : text;
+  label : text;
+  state_or_province : text;
+  house_number : text;
+  house_number_addition : text;
+};
+type ApiError = record {
+  tag : opt text;
+  info : opt vec text;
+  method_name : opt text;
+  message : opt text;
+  timestamp : nat64;
+  error_type : ApiErrorType;
+};
+type ApiErrorType = variant {
+  Duplicate;
+  SerializeError;
+  DeserializeError;
+  NotFound;
+  ValidationError : vec ValidationResponse;
+  Unsupported;
+  Unauthorized;
+  Unexpected;
+  NotImplemented;
+  BadRequest;
+};
+type Asset = variant { Url : text; None; CanisterStorage : CanisterStorage };
+type CanisterStorage = variant { None; Manifest : Manifest; Chunk : ChunkData };
+type ChunkData = record {
+  chunk_id : nat64;
+  canister : principal;
+  index : nat64;
+};
+type DateRange = record { end_date : nat64; start_date : nat64 };
+type GatedType = variant { Neuron : vec NeuronGated; Token : vec TokenGated };
+type Group = record {
+  updated_on : nat64;
+  banner_image : Asset;
+  special_members : vec record { principal; text };
+  owner : principal;
+  name : text;
+  matrix_space_id : text;
+  tags : vec nat32;
+  description : text;
+  created_by : principal;
+  created_on : nat64;
+  website : text;
+  notification_id : opt nat64;
+  privacy : Privacy;
+  wallets : vec record { principal; text };
+  image : Asset;
+  privacy_gated_type_amount : opt nat64;
+  location : Location;
+  roles : vec Role;
+  is_deleted : bool;
+};
+type GroupFilter = variant {
+  Ids : vec nat64;
+  Tag : nat32;
+  UpdatedOn : DateRange;
+  Name : text;
+  None;
+  Owner : principal;
+  CreatedOn : DateRange;
+};
+type Location = variant {
+  None;
+  Digital : text;
+  Physical : PhysicalLocation;
+  MultiLocation : MultiLocation;
+};
+type Manifest = record { entries : vec ChunkData };
+type MultiLocation = record { physical : PhysicalLocation; digital : text };
+type NeuronGated = record {
+  governance_canister : principal;
+  name : text;
+  description : text;
+  ledger_canister : principal;
+  rules : vec NeuronGatedRules;
+};
+type NeuronGatedRules = variant {
+  IsDisolving : bool;
+  MinStake : nat64;
+  MinAge : nat64;
+  MinDissolveDelay : nat64;
+};
+type Permission = record {
+  name : text;
+  actions : PermissionActions;
+  protected : bool;
+};
+type PermissionActions = record {
+  edit : bool;
+  read : bool;
+  delete : bool;
+  write : bool;
+};
+type PhysicalLocation = record {
+  longtitude : float32;
+  address : Address;
+  lattitude : float32;
+};
+type Privacy = variant { Gated : GatedType; Private; Public; InviteOnly };
+type Result = variant { Ok : vec record { nat64; Group }; Err : ApiError };
+type Result_1 = variant { Ok : opt record { nat64; Group }; Err : ApiError };
+type Result_2 = variant { Ok : record { nat64; Group }; Err : ApiError };
+type Result_3 = variant { Ok : bool; Err : ApiError };
+type Result_4 = variant { Ok; Err : ApiError };
+type Result_5 = variant { Ok : nat64; Err : ApiError };
+type Role = record {
+  permissions : vec Permission;
+  name : text;
+  color : text;
+  protected : bool;
+  index : opt nat64;
+};
+type TokenGated = record {
+  "principal" : principal;
+  name : text;
+  description : text;
+  amount : nat64;
+  standard : text;
+};
+type ValidationResponse = record { field : text; message : text };
+service : () -> {
+  __get_candid_interface_tmp_hack : () -> (text) query;
+  filter : (vec GroupFilter) -> (Result) query;
+  find : (vec GroupFilter) -> (Result_1) query;
+  get : (nat64) -> (Result_2) query;
+  get_all : () -> (Result) query;
+  get_many : (vec nat64) -> (Result) query;
+  icts_name : () -> (text) query;
+  icts_version : () -> (text) query;
+  insert : (nat64, Group) -> (Result_2);
+  remove : (nat64) -> (Result_3);
+  remove_many : (vec nat64) -> (Result_4);
+  size : () -> (Result_5) query;
+  update : (nat64, Group) -> (Result_2);
+  update_many : (vec record { nat64; Group }) -> (Result);
+}

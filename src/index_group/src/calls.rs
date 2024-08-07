@@ -1,19 +1,16 @@
 use candid::Principal;
-use catalyze_shared::{
-    api_error::ApiError,
-    group::{Group, GroupEntry, GroupFilter},
-    CanisterResult,
-};
+use catalyze_shared::{api_error::ApiError, paged_response::PagedResponse, CanisterResult};
 use common::{
     controller, is_developer, is_migration, is_proxy, spawn_shard, CellStorage, IDIter,
-    IndexController, ShardsIndex,
+    IndexConfig, IndexConfigWithKeyIter, IndexController, ShardsIndex,
 };
 use ic_cdk::{init, query, trap, update};
 use serde_bytes::ByteBuf;
 
 use crate::{
-    index::GroupIndex,
-    storage::{IDIterator, Proxies, ShardIter, ShardWasm, Shards},
+    aliases::{Entry, EntryFilter, EntrySort, Key, Value},
+    config::config,
+    controller::controller,
 };
 
 fn is_proxy_guard() -> Result<(), String> {
@@ -21,7 +18,7 @@ fn is_proxy_guard() -> Result<(), String> {
         return Ok(());
     }
 
-    is_proxy(Proxies::default().get().expect("Failed to get proxies"))
+    is_proxy(config().proxies().get().expect("Failed to get proxies"))
 }
 
 #[init]
@@ -30,24 +27,25 @@ fn init(proxies: Vec<Principal>) {
         trap("Proxies cannot be empty");
     }
 
-    Proxies::default()
+    config()
+        .proxies()
         .set(proxies.into())
         .expect("Failed to set proxies");
 }
 
 #[update(guard = "is_proxy_guard")]
 async fn _dev_extend_shards(shards: u64) -> CanisterResult<ShardsIndex> {
-    let shard_ids = Shards::default().get().unwrap_or_default();
-    let shard_wasm = ShardWasm::default().get()?;
+    let shard_ids = config().shards().get().unwrap_or_default();
+    let shard_wasm = config().shard_wasm().get()?;
     let mut new_shards_list = shard_ids.to_vec();
 
     for _ in 0..shards {
         new_shards_list.push(spawn_shard(shard_wasm.clone()).await?);
     }
-    let shard_ids = Shards::default().set(new_shards_list.clone().into())?;
+    let shard_ids = config().shards().set(new_shards_list.clone().into())?;
 
-    if ShardIter::default().get().is_err() {
-        ShardIter::default().set(new_shards_list[0].id())?;
+    if config().shard_iter().get().is_err() {
+        config().shard_iter().set(new_shards_list[0].id())?;
     }
 
     Ok(shard_ids)
@@ -55,12 +53,12 @@ async fn _dev_extend_shards(shards: u64) -> CanisterResult<ShardsIndex> {
 
 #[update(guard = "is_proxy_guard")]
 fn _dev_upload_wasm(wasm: ByteBuf) -> bool {
-    ShardWasm::default().set(wasm.into_vec()).is_ok()
+    config().shard_wasm().set(wasm.into_vec()).is_ok()
 }
 
 #[update(guard = "is_proxy_guard")]
 fn _dev_set_shard_filled(shard: Principal, filled: bool) -> CanisterResult<ShardsIndex> {
-    let mut shard_ids = Shards::default().get()?.to_vec();
+    let mut shard_ids = config().shards().get()?.to_vec();
 
     let idx = shard_ids
         .iter()
@@ -72,66 +70,88 @@ fn _dev_set_shard_filled(shard: Principal, filled: bool) -> CanisterResult<Shard
     let shard = shard_ids.get_mut(idx).expect("Shard not found");
     shard.set_filled(filled);
 
-    Shards::default().set(shard_ids.clone().into())
+    config().shards().set(shard_ids.clone().into())
 }
 
 #[query(composite = true, guard = "is_proxy_guard")]
 async fn size() -> CanisterResult<u64> {
-    GroupIndex.size().await
+    controller().size().await
 }
 
 #[query(composite = true, guard = "is_proxy_guard")]
-async fn get(key: u64) -> CanisterResult<GroupEntry> {
-    GroupIndex.get(key).await
+async fn get(key: Key) -> CanisterResult<Entry> {
+    controller().get(key).await
 }
 
 #[query(composite = true, guard = "is_proxy_guard")]
-async fn get_many(keys: Vec<u64>) -> CanisterResult<Vec<GroupEntry>> {
-    GroupIndex.get_many(keys).await
+async fn get_many(keys: Vec<Key>) -> CanisterResult<Vec<Entry>> {
+    controller().get_many(keys).await
 }
 
 #[query(composite = true, guard = "is_proxy_guard")]
-async fn get_all() -> CanisterResult<Vec<GroupEntry>> {
-    GroupIndex.get_all().await
+async fn get_all() -> CanisterResult<Vec<Entry>> {
+    controller().get_all().await
 }
 
 #[query(composite = true, guard = "is_proxy_guard")]
-async fn find(filters: Vec<GroupFilter>) -> CanisterResult<Option<GroupEntry>> {
-    GroupIndex.find(filters).await
+async fn get_paginated(
+    limit: usize,
+    page: usize,
+    sort: EntrySort,
+) -> CanisterResult<PagedResponse<Entry>> {
+    controller().get_paginated(limit, page, sort).await
 }
 
 #[query(composite = true, guard = "is_proxy_guard")]
-async fn filter(filters: Vec<GroupFilter>) -> CanisterResult<Vec<GroupEntry>> {
-    GroupIndex.filter(filters).await
+async fn find(filters: Vec<EntryFilter>) -> CanisterResult<Option<Entry>> {
+    controller().find(filters).await
+}
+
+#[query(composite = true, guard = "is_proxy_guard")]
+async fn filter(filters: Vec<EntryFilter>) -> CanisterResult<Vec<Entry>> {
+    controller().filter(filters).await
+}
+
+#[query(composite = true, guard = "is_proxy_guard")]
+async fn filter_paginated(
+    limit: usize,
+    page: usize,
+    sort: EntrySort,
+    filters: Vec<EntryFilter>,
+) -> CanisterResult<PagedResponse<Entry>> {
+    controller()
+        .filter_paginated(limit, page, sort, filters)
+        .await
 }
 
 #[update(guard = "is_proxy_guard")]
-async fn insert(value: Group) -> CanisterResult<GroupEntry> {
-    let key = IDIterator::default().next()?;
-    GroupIndex.insert(key, value).await
+async fn insert(value: Value) -> CanisterResult<Entry> {
+    controller()
+        .insert(config().key_iter().next()?, value)
+        .await
 }
 
 #[update(guard = "is_migration")]
-async fn insert_by_key(key: u64, value: Group) -> CanisterResult<GroupEntry> {
-    controller::insert_by_key(GroupIndex, IDIterator::default(), key, value).await
+async fn insert_by_key(key: Key, value: Value) -> CanisterResult<Entry> {
+    controller::insert_by_key(controller(), config().key_iter(), key, value).await
 }
 
 #[update(guard = "is_proxy_guard")]
-async fn update(key: u64, value: Group) -> CanisterResult<GroupEntry> {
-    GroupIndex.update(key, value).await
+async fn update(key: Key, value: Value) -> CanisterResult<Entry> {
+    controller().update(key, value).await
 }
 
 #[update(guard = "is_proxy_guard")]
-async fn update_many(list: Vec<GroupEntry>) -> CanisterResult<Vec<GroupEntry>> {
-    GroupIndex.update_many(list).await
+async fn update_many(list: Vec<Entry>) -> CanisterResult<Vec<Entry>> {
+    controller().update_many(list).await
 }
 
 #[update(guard = "is_proxy_guard")]
-async fn remove(key: u64) -> CanisterResult<bool> {
-    GroupIndex.remove(key).await
+async fn remove(key: Key) -> CanisterResult<bool> {
+    controller().remove(key).await
 }
 
 #[update(guard = "is_proxy_guard")]
-async fn remove_many(keys: Vec<u64>) -> CanisterResult<()> {
-    GroupIndex.remove_many(keys).await
+async fn remove_many(keys: Vec<Key>) -> CanisterResult<()> {
+    controller().remove_many(keys).await
 }

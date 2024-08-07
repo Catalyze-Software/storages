@@ -1,11 +1,10 @@
-use common::{queries, CellStorage};
+use common::{queries, CellStorage, ShardController};
 use ic_cdk::{caller, init, query};
-use storage::Index;
 
 mod aliases;
 mod calls;
 mod controller;
-mod storage;
+mod state;
 
 #[query]
 fn icts_name() -> String {
@@ -29,7 +28,8 @@ pub fn __export_did_tmp_() -> String {
 
 #[init]
 fn init() {
-    Index::default()
+    controller::controller()
+        .index()
         .set(caller())
         .expect("Failed to set index canister ID");
 }
@@ -38,7 +38,7 @@ fn init() {
 #[test]
 pub fn candid() {
     catalyze_shared::candid::save_candid_file(
-        &format!("../../candid/{}.did", crate::aliases::CANDID_PATH),
+        &format!("../../candid/{}.did", crate::aliases::DATA_KIND),
         __export_did_tmp_(),
     );
 }
