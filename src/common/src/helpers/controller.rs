@@ -1,7 +1,7 @@
 use catalyze_shared::{api_error::ApiError, CanisterResult, Filter, Sorter};
 use ic_stable_structures::Storable;
 
-use crate::{IDIter, IDMap, IndexController};
+use crate::{IDIter, IndexConfig, IndexController, Registry};
 
 pub async fn insert_by_key<V, F, S>(
     controller: impl IndexController<u64, V, F, S>,
@@ -20,7 +20,7 @@ where
     F: 'static + Filter<u64, V> + candid::CandidType + Clone + Send + Sync,
     S: 'static + Sorter<u64, V> + Default + candid::CandidType + Clone + Send + Sync,
 {
-    if controller.ids().exists(key) {
+    if controller.config().registry().exists(key) {
         return Err(ApiError::unexpected()
             .add_message("Key already exists")
             .add_info(key.to_string().as_str()));

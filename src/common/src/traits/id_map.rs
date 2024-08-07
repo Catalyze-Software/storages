@@ -2,7 +2,7 @@ use candid::Principal;
 use catalyze_shared::{api_error::ApiError, CanisterResult, StaticStorageRef};
 use ic_stable_structures::Storable;
 
-pub trait IDMap<K: 'static + Storable + Ord + Clone>: Send + Sync {
+pub trait Registry<K: 'static + Storable + Ord + Clone>: Send + Sync {
     fn name(&self) -> String;
     fn storage(&self) -> StaticStorageRef<K, Principal>;
 
