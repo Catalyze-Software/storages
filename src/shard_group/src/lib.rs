@@ -38,7 +38,7 @@ fn init() {
 #[test]
 pub fn candid() {
     catalyze_shared::candid::save_candid_file(
-        &format!("../../candid/{}.did", crate::aliases::DATA_KIND),
+        &format!("../../candid/shard_{}.did", crate::aliases::DATA_KIND),
         __export_did_tmp_(),
     );
 }

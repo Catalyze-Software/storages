@@ -3,8 +3,7 @@ use catalyze_shared::profile_with_refs::{
     ProfileEntry, ProfileFilter, ProfileSort, ProfileWithRefs,
 };
 
-#[allow(dead_code)]
-pub const DATA_KIND: &str = "shard_profile";
+pub const DATA_KIND: &str = "profile";
 
 pub type Key = Principal;
 pub type Value = ProfileWithRefs;

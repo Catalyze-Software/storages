@@ -1,7 +1,7 @@
 use catalyze_shared::report::{Report, ReportEntry, ReportFilter, ReportSort};
 
 #[allow(dead_code)]
-pub const CANDID_PATH: &str = "index_report";
+pub const DATA_KIND: &str = "report";
 
 pub type Key = u64;
 pub type Value = Report;

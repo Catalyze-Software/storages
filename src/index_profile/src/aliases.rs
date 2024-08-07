@@ -4,7 +4,7 @@ use catalyze_shared::profile_with_refs::{
 };
 
 #[allow(dead_code)]
-pub const CANDID_PATH: &str = "index_profile";
+pub const DATA_KIND: &str = "profile";
 
 pub type Key = Principal;
 pub type Value = ProfileWithRefs;

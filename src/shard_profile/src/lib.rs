@@ -20,7 +20,7 @@ fn icts_version() -> String {
 #[query(name = "__get_candid_interface_tmp_hack")]
 pub fn __export_did_tmp_() -> String {
     use crate::aliases::*;
-    use candid::{export_service, Principal};
+    use candid::export_service;
     use catalyze_shared::CanisterResult;
     export_service!();
     __export_service()
@@ -38,7 +38,7 @@ fn init() {
 #[test]
 pub fn candid() {
     catalyze_shared::candid::save_candid_file(
-        &format!("../../candid/{}.did", crate::aliases::DATA_KIND),
+        &format!("../../candid/shard_{}.did", crate::aliases::DATA_KIND),
         __export_did_tmp_(),
     );
 }
