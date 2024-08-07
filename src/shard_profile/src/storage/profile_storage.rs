@@ -1,12 +1,13 @@
-use candid::Principal;
-use catalyze_shared::{profile::Profile, StaticStorageRef};
+use catalyze_shared::StaticStorageRef;
 use common::ShardStorage;
+
+use crate::aliases::{Key, Value};
 
 use super::PROFILES;
 
 pub struct ProfileStorage {
     pub name: String,
-    pub raw: StaticStorageRef<Principal, Profile>,
+    pub raw: StaticStorageRef<Key, Value>,
 }
 
 impl Default for ProfileStorage {
@@ -18,12 +19,12 @@ impl Default for ProfileStorage {
     }
 }
 
-impl ShardStorage<Principal, Profile> for ProfileStorage {
+impl ShardStorage<Key, Value> for ProfileStorage {
     fn name(&self) -> String {
         self.name.clone()
     }
 
-    fn storage(&self) -> StaticStorageRef<Principal, Profile> {
+    fn storage(&self) -> StaticStorageRef<Key, Value> {
         self.raw
     }
 }

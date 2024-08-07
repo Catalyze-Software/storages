@@ -1,13 +1,14 @@
-use candid::Principal;
-use catalyze_shared::profile::{Profile, ProfileFilter};
 use common::ShardController;
 
-use crate::storage::ProfileStorage;
+use crate::{
+    aliases::{EntryFilter, Key, Value},
+    storage::ProfileStorage,
+};
 
 pub struct ProfileController;
 
-impl ShardController<Principal, Profile, ProfileFilter> for ProfileController {
-    fn storage(&self) -> impl common::ShardStorage<Principal, Profile> {
+impl ShardController<Key, Value, EntryFilter> for ProfileController {
+    fn storage(&self) -> impl common::ShardStorage<Key, Value> {
         ProfileStorage::default()
     }
 }

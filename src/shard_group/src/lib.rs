@@ -2,6 +2,7 @@ use common::{queries, CellStorage};
 use ic_cdk::{caller, init, query};
 use storage::Index;
 
+mod aliases;
 mod calls;
 mod controller;
 mod storage;
@@ -19,11 +20,9 @@ fn icts_version() -> String {
 // Hacky way to expose the candid interface to the outside world
 #[query(name = "__get_candid_interface_tmp_hack")]
 pub fn __export_did_tmp_() -> String {
+    use crate::aliases::*;
     use candid::export_service;
-    use catalyze_shared::{
-        group::{Group, GroupEntry, GroupFilter},
-        CanisterResult,
-    };
+    use catalyze_shared::CanisterResult;
     export_service!();
     __export_service()
 }
@@ -38,5 +37,8 @@ fn init() {
 // Method used to save the candid interface to a file
 #[test]
 pub fn candid() {
-    catalyze_shared::candid::save_candid_file("../../candid/shard_group.did", __export_did_tmp_());
+    catalyze_shared::candid::save_candid_file(
+        &format!("../../candid/{}.did", crate::aliases::CANDID_PATH),
+        __export_did_tmp_(),
+    );
 }

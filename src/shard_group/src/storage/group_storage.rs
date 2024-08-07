@@ -1,11 +1,13 @@
-use catalyze_shared::{group::Group, StaticStorageRef};
+use catalyze_shared::StaticStorageRef;
 use common::ShardStorage;
+
+use crate::aliases::{Key, Value};
 
 use super::GROUPS;
 
 pub struct GroupStorage {
     pub name: String,
-    pub raw: StaticStorageRef<u64, Group>,
+    pub raw: StaticStorageRef<Key, Value>,
 }
 
 impl Default for GroupStorage {
@@ -17,12 +19,12 @@ impl Default for GroupStorage {
     }
 }
 
-impl ShardStorage<u64, Group> for GroupStorage {
+impl ShardStorage<Key, Value> for GroupStorage {
     fn name(&self) -> String {
         self.name.clone()
     }
 
-    fn storage(&self) -> StaticStorageRef<u64, Group> {
+    fn storage(&self) -> StaticStorageRef<Key, Value> {
         self.raw
     }
 }

@@ -1,11 +1,12 @@
-use candid::Principal;
 use common::{CellStorage, StaticCellStorageRef};
+
+use crate::aliases::Key;
 
 use super::INDEX;
 
 pub struct Index {
     name: String,
-    storage: StaticCellStorageRef<Principal>,
+    storage: StaticCellStorageRef<Key>,
 }
 
 impl Default for Index {
@@ -17,12 +18,12 @@ impl Default for Index {
     }
 }
 
-impl CellStorage<Principal> for Index {
+impl CellStorage<Key> for Index {
     fn name(&self) -> String {
         self.name.clone()
     }
 
-    fn storage(&self) -> StaticCellStorageRef<Principal> {
+    fn storage(&self) -> StaticCellStorageRef<Key> {
         self.storage
     }
 }
