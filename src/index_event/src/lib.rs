@@ -7,7 +7,7 @@ use serde_bytes::ByteBuf;
 mod aliases;
 mod calls;
 mod config;
-mod index;
+mod controller;
 mod state;
 
 #[query]

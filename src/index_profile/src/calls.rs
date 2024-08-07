@@ -9,7 +9,7 @@ use serde_bytes::ByteBuf;
 use crate::{
     aliases::{Entry, EntryFilter, EntrySort, Key, Value},
     config::config,
-    index::index,
+    controller::controller,
 };
 
 fn is_proxy_guard() -> Result<(), String> {
@@ -74,22 +74,22 @@ fn _dev_set_shard_filled(shard: Principal, filled: bool) -> CanisterResult<Shard
 
 #[query(composite = true, guard = "is_proxy_guard")]
 async fn size() -> CanisterResult<u64> {
-    index().size().await
+    controller().size().await
 }
 
 #[query(composite = true, guard = "is_proxy_guard")]
 async fn get(key: Key) -> CanisterResult<Entry> {
-    index().get(key).await
+    controller().get(key).await
 }
 
 #[query(composite = true, guard = "is_proxy_guard")]
 async fn get_many(keys: Vec<Key>) -> CanisterResult<Vec<Entry>> {
-    index().get_many(keys).await
+    controller().get_many(keys).await
 }
 
 #[query(composite = true, guard = "is_proxy_guard")]
 async fn get_all() -> CanisterResult<Vec<Entry>> {
-    index().get_all().await
+    controller().get_all().await
 }
 
 #[query(composite = true, guard = "is_proxy_guard")]
@@ -98,17 +98,17 @@ async fn get_paginated(
     page: usize,
     sort: EntrySort,
 ) -> CanisterResult<PagedResponse<Entry>> {
-    index().get_paginated(limit, page, sort).await
+    controller().get_paginated(limit, page, sort).await
 }
 
 #[query(composite = true, guard = "is_proxy_guard")]
 async fn find(filters: Vec<EntryFilter>) -> CanisterResult<Option<Entry>> {
-    index().find(filters).await
+    controller().find(filters).await
 }
 
 #[query(composite = true, guard = "is_proxy_guard")]
 async fn filter(filters: Vec<EntryFilter>) -> CanisterResult<Vec<Entry>> {
-    index().filter(filters).await
+    controller().filter(filters).await
 }
 
 #[query(composite = true, guard = "is_proxy_guard")]
@@ -118,30 +118,32 @@ async fn filter_paginated(
     sort: EntrySort,
     filters: Vec<EntryFilter>,
 ) -> CanisterResult<PagedResponse<Entry>> {
-    index().filter_paginated(limit, page, sort, filters).await
+    controller()
+        .filter_paginated(limit, page, sort, filters)
+        .await
 }
 
 #[update(guard = "is_proxy_guard")]
 async fn insert(key: Key, value: Value) -> CanisterResult<Entry> {
-    index().insert(key, value).await
+    controller().insert(key, value).await
 }
 
 #[update(guard = "is_proxy_guard")]
 async fn update(key: Key, value: Value) -> CanisterResult<Entry> {
-    index().update(key, value).await
+    controller().update(key, value).await
 }
 
 #[update(guard = "is_proxy_guard")]
 async fn update_many(list: Vec<Entry>) -> CanisterResult<Vec<Entry>> {
-    index().update_many(list).await
+    controller().update_many(list).await
 }
 
 #[update(guard = "is_proxy_guard")]
 async fn remove(key: Key) -> CanisterResult<bool> {
-    index().remove(key).await
+    controller().remove(key).await
 }
 
 #[update(guard = "is_proxy_guard")]
 async fn remove_many(keys: Vec<Key>) -> CanisterResult<()> {
-    index().remove_many(keys).await
+    controller().remove_many(keys).await
 }
