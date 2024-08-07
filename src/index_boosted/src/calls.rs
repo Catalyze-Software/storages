@@ -32,27 +32,27 @@ fn init(proxies: Vec<Principal>) {
         .expect("Failed to set proxies");
 }
 
-#[query(composite = true, guard = "is_proxy_guard")]
+#[query(guard = "is_proxy_guard")]
 fn size() -> CanisterResult<u64> {
     controller().size()
 }
 
-#[query(composite = true, guard = "is_proxy_guard")]
+#[query(guard = "is_proxy_guard")]
 fn get(key: Key) -> CanisterResult<Entry> {
     controller().get(key)
 }
 
-#[query(composite = true, guard = "is_proxy_guard")]
+#[query(guard = "is_proxy_guard")]
 fn get_many(keys: Vec<Key>) -> CanisterResult<Vec<Entry>> {
     controller().get_many(keys)
 }
 
-#[query(composite = true, guard = "is_proxy_guard")]
+#[query(guard = "is_proxy_guard")]
 fn get_all() -> CanisterResult<Vec<Entry>> {
     controller().get_all()
 }
 
-#[query(composite = true, guard = "is_proxy_guard")]
+#[query(guard = "is_proxy_guard")]
 fn get_paginated(
     limit: usize,
     page: usize,
@@ -61,17 +61,17 @@ fn get_paginated(
     controller().get_paginated(limit, page, sort)
 }
 
-#[query(composite = true, guard = "is_proxy_guard")]
+#[query(guard = "is_proxy_guard")]
 fn find(filters: Vec<EntryFilter>) -> CanisterResult<Option<Entry>> {
     controller().find(filters)
 }
 
-#[query(composite = true, guard = "is_proxy_guard")]
+#[query(guard = "is_proxy_guard")]
 fn filter(filters: Vec<EntryFilter>) -> CanisterResult<Vec<Entry>> {
     controller().filter(filters)
 }
 
-#[query(composite = true, guard = "is_proxy_guard")]
+#[query(guard = "is_proxy_guard")]
 fn filter_paginated(
     limit: usize,
     page: usize,
