@@ -1,18 +1,16 @@
+use crate::{CellStorage, StaticCellStorageRef};
 use candid::Principal;
-use common::{CellStorage, StaticCellStorageRef};
-
-use super::state::SHARD_ITER;
 
 pub struct ShardIter {
     name: String,
     storage: StaticCellStorageRef<Principal>,
 }
 
-impl Default for ShardIter {
-    fn default() -> Self {
+impl ShardIter {
+    pub fn new(storage: StaticCellStorageRef<Principal>) -> Self {
         Self {
             name: "shard_iter".to_owned(),
-            storage: &SHARD_ITER,
+            storage,
         }
     }
 }

@@ -1,17 +1,15 @@
-use common::{CellStorage, ShardsIndex, StaticCellStorageRef};
-
-use super::state::SHARDS;
+use crate::{CellStorage, ShardsIndex, StaticCellStorageRef};
 
 pub struct Shards {
     name: String,
     storage: StaticCellStorageRef<ShardsIndex>,
 }
 
-impl Default for Shards {
-    fn default() -> Self {
+impl Shards {
+    pub fn new(storage: StaticCellStorageRef<ShardsIndex>) -> Self {
         Self {
             name: "shards".to_owned(),
-            storage: &SHARDS,
+            storage,
         }
     }
 }

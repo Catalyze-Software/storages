@@ -4,9 +4,11 @@ use common::{queries, ShardsIndex};
 use ic_cdk::query;
 use serde_bytes::ByteBuf;
 
+mod aliases;
 mod calls;
+mod config;
 mod index;
-mod storage;
+mod state;
 
 #[query]
 fn icts_name() -> String {
@@ -21,11 +23,9 @@ fn icts_version() -> String {
 // Hacky way to expose the candid interface to the outside world
 #[query(name = "__get_candid_interface_tmp_hack")]
 pub fn __export_did_tmp_() -> String {
+    use crate::aliases::*;
     use candid::export_service;
-    use catalyze_shared::{
-        paged_response::PagedResponse,
-        profile::{Profile, ProfileEntry, ProfileFilter, ProfileSort},
-    };
+    use catalyze_shared::paged_response::PagedResponse;
 
     export_service!();
     __export_service()
@@ -35,7 +35,7 @@ pub fn __export_did_tmp_() -> String {
 #[test]
 pub fn candid() {
     catalyze_shared::candid::save_candid_file(
-        "../../candid/index_profile.did",
+        &format!("../../candid/{}.did", crate::aliases::CANDID_PATH),
         __export_did_tmp_(),
     );
 }

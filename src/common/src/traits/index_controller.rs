@@ -7,7 +7,7 @@ use catalyze_shared::{
 };
 use ic_stable_structures::Storable;
 
-use crate::{CellStorage, IDMap, ShardClient, ShardsIndex};
+use crate::{CellStorage, IndexConfig, Registry, ShardClient};
 
 #[async_trait]
 pub trait IndexController<K, V, F, S>: Send + Sync
@@ -32,19 +32,19 @@ where
     F: 'static + Filter<K, V> + candid::CandidType + Clone + Send + Sync,
     S: 'static + Sorter<K, V> + Default + candid::CandidType + Clone + Send + Sync,
 {
-    /// Shards storage
-    fn shards(&self) -> impl CellStorage<ShardsIndex>;
-    /// Shard iterator storage, responsible for round-robin shard selection
-    fn shard_iter(&self) -> impl CellStorage<Principal>;
-    /// Entry ID to shard mapping storage
-    fn ids(&self) -> impl IDMap<K>;
+    /// Storage config
+    fn config(&self) -> impl IndexConfig<K>;
+
     /// Shard client
-    fn client(&self) -> impl ShardClient<K, V, F>;
+    fn client(&self) -> impl ShardClient<K, V, F> {
+        IndexShardClient
+    }
 
     /// Get the next shard in the round-robin sequence
     fn next_shard(&self) -> CanisterResult<Principal> {
-        let current = self.shard_iter().get()?;
+        let current = self.config().shard_iter().get()?;
         let shards = self
+            .config()
             .shards()
             .get()?
             .to_vec()
@@ -64,14 +64,14 @@ where
             current + 1
         };
 
-        self.shard_iter().set(shards[next].id())?;
+        self.config().shard_iter().set(shards[next].id())?;
 
         Ok(shards[current].id())
     }
 
     async fn size(&self) -> CanisterResult<u64> {
         let mut size = 0;
-        let shards = self.shards().get()?;
+        let shards = self.config().shards().get()?;
 
         for shard in shards.to_vec().iter() {
             size += self.client().size(shard.id()).await?;
@@ -81,7 +81,7 @@ where
     }
 
     async fn get(&self, id: K) -> CanisterResult<(K, V)> {
-        let shard = self.ids().shard_by_id(id.clone())?;
+        let shard = self.config().registry().shard_by_id(id.clone())?;
         self.client().get(shard, id).await
     }
 
@@ -92,7 +92,7 @@ where
             .clone()
             .into_iter()
             .try_fold(HashMap::new(), |mut acc, id| {
-                let shard = self.ids().shard_by_id(id.clone())?;
+                let shard = self.config().registry().shard_by_id(id.clone())?;
                 let entry: &mut Vec<K> = acc.entry(shard).or_default();
                 entry.push(id);
                 Ok(acc)
@@ -119,7 +119,7 @@ where
 
     async fn get_all(&self) -> CanisterResult<Vec<(K, V)>> {
         let mut res = Vec::new();
-        let shards = self.shards().get()?;
+        let shards = self.config().shards().get()?;
 
         for shard in shards.to_vec().iter() {
             let values = self.client().get_all(shard.id()).await?;
@@ -136,7 +136,7 @@ where
         sort: S,
     ) -> CanisterResult<PagedResponse<(K, V)>> {
         let mut res = Vec::new();
-        let shards = self.shards().get()?;
+        let shards = self.config().shards().get()?;
 
         for shard in shards.to_vec().iter() {
             let values = self.client().get_all(shard.id()).await?;
@@ -147,7 +147,7 @@ where
     }
 
     async fn find(&self, filters: Vec<F>) -> CanisterResult<Option<(K, V)>> {
-        let shards = self.shards().get()?;
+        let shards = self.config().shards().get()?;
 
         for shard in shards.to_vec().iter() {
             let value = self.client().find(shard.id(), filters.clone()).await?;
@@ -161,7 +161,7 @@ where
 
     async fn filter(&self, filters: Vec<F>) -> CanisterResult<Vec<(K, V)>> {
         let mut res = Vec::new();
-        let shards = self.shards().get()?;
+        let shards = self.config().shards().get()?;
 
         for shard in shards.to_vec().iter() {
             let values = self.client().filter(shard.id(), filters.clone()).await?;
@@ -179,7 +179,7 @@ where
         filters: Vec<F>,
     ) -> CanisterResult<PagedResponse<(K, V)>> {
         let mut res = Vec::new();
-        let shards = self.shards().get()?;
+        let shards = self.config().shards().get()?;
 
         for shard in shards.to_vec().iter() {
             let values = self.client().filter(shard.id(), filters.clone()).await?;
@@ -190,19 +190,19 @@ where
     }
 
     async fn insert(&self, key: K, value: V) -> CanisterResult<(K, V)> {
-        if self.ids().exists(key.clone()) {
+        if self.config().registry().exists(key.clone()) {
             return Err(ApiError::unexpected()
                 .add_message("Key already exists")
                 .add_info(key.to_string().as_str()));
         }
 
         let shard = self.next_shard()?;
-        self.ids().insert(key.clone(), shard)?;
+        self.config().registry().insert(key.clone(), shard)?;
         self.client().insert(shard, key, value).await
     }
 
     async fn update(&self, key: K, value: V) -> CanisterResult<(K, V)> {
-        let shard = self.ids().shard_by_id(key.clone())?;
+        let shard = self.config().registry().shard_by_id(key.clone())?;
         self.client().update(shard, key, value).await
     }
 
@@ -213,7 +213,7 @@ where
             .clone()
             .into_iter()
             .try_fold(HashMap::new(), |mut acc, (id, _)| {
-                let shard = self.ids().shard_by_id(id.clone())?;
+                let shard = self.config().registry().shard_by_id(id.clone())?;
                 let entry: &mut Vec<K> = acc.entry(shard).or_default();
                 entry.push(id);
                 Ok(acc)
@@ -242,13 +242,13 @@ where
     }
 
     async fn remove(&self, key: K) -> CanisterResult<bool> {
-        let shard = self.ids().shard_by_id(key.clone())?;
+        let shard = self.config().registry().shard_by_id(key.clone())?;
         self.client().remove(shard, key).await
     }
 
     async fn remove_many(&self, keys: Vec<K>) -> CanisterResult<()> {
         let ids_map = keys.into_iter().try_fold(HashMap::new(), |mut acc, id| {
-            let shard = self.ids().shard_by_id(id.clone())?;
+            let shard = self.config().registry().shard_by_id(id.clone())?;
             let entry: &mut Vec<K> = acc.entry(shard).or_default();
             entry.push(id);
             Ok(acc)
@@ -260,4 +260,30 @@ where
 
         Ok(())
     }
+}
+
+#[derive(Default)]
+pub(crate) struct IndexShardClient;
+
+impl<K, V, F> ShardClient<K, V, F> for IndexShardClient
+where
+    K: 'static
+        + candid::CandidType
+        + for<'a> candid::Deserialize<'a>
+        + std::hash::Hash
+        + Storable
+        + Ord
+        + Clone
+        + Display
+        + Send
+        + Sync,
+    V: 'static
+        + candid::CandidType
+        + for<'a> candid::Deserialize<'a>
+        + Storable
+        + Clone
+        + Send
+        + Sync,
+    F: 'static + Filter<K, V> + candid::CandidType + Clone + Send + Sync,
+{
 }

@@ -8,12 +8,14 @@ use ic_stable_structures::{
     Cell, DefaultMemoryImpl, StableBTreeMap,
 };
 
+use crate::aliases::Key;
+
 pub static PROXIES_MEMORY_ID: MemoryId = MemoryId::new(0);
 pub static SHARDS_MEMORY_ID: MemoryId = MemoryId::new(1);
-pub static SHARD_ITER_MEMORY_ID: MemoryId = MemoryId::new(2);
-pub static SHARD_WASM_MEMORY_ID: MemoryId = MemoryId::new(3);
-
-pub static IDS_MEMORY_ID: MemoryId = MemoryId::new(4);
+pub static KEY_ITER_MEMORY_ID: MemoryId = MemoryId::new(2);
+pub static SHARD_ITER_MEMORY_ID: MemoryId = MemoryId::new(3);
+pub static SHARD_WASM_MEMORY_ID: MemoryId = MemoryId::new(4);
+pub static REGISTRY_MEMORY_ID: MemoryId = MemoryId::new(5);
 
 thread_local! {
     pub static MEMORY_MANAGER: MemoryManagerStorage =
@@ -31,11 +33,15 @@ thread_local! {
         Cell::init(MEMORY_MANAGER.with(|p| p.borrow().get(SHARD_ITER_MEMORY_ID)), None).expect("Failed to initialize shard iter cell")
     );
 
+    pub static KEY_ITER: CellStorageRef<Key> = RefCell::new(
+        Cell::init(MEMORY_MANAGER.with(|p| p.borrow().get(KEY_ITER_MEMORY_ID)), None).expect("Failed to initialize key iter cell")
+    );
+
     pub static SHARD_WASM: CellStorageRef<Vec<u8>> = RefCell::new(
         Cell::init(MEMORY_MANAGER.with(|p| p.borrow().get(SHARD_WASM_MEMORY_ID)), None).expect("Failed to initialize shards wasm cell")
     );
 
-    pub static IDS: StorageRef<Principal, Principal> = RefCell::new(
-        StableBTreeMap::init(MEMORY_MANAGER.with(|p| p.borrow().get(IDS_MEMORY_ID)))
+    pub static REGISTRY: StorageRef<Key, Principal> = RefCell::new(
+        StableBTreeMap::init(MEMORY_MANAGER.with(|p| p.borrow().get(REGISTRY_MEMORY_ID)))
     );
 }

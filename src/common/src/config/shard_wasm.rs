@@ -1,17 +1,15 @@
-use common::{CellStorage, StaticCellStorageRef};
-
-use super::state::SHARD_WASM;
+use crate::{CellStorage, StaticCellStorageRef};
 
 pub struct ShardWasm {
     name: String,
     storage: StaticCellStorageRef<Vec<u8>>,
 }
 
-impl Default for ShardWasm {
-    fn default() -> Self {
+impl ShardWasm {
+    pub fn new(storage: StaticCellStorageRef<Vec<u8>>) -> Self {
         Self {
             name: "shard_wasm".to_owned(),
-            storage: &SHARD_WASM,
+            storage,
         }
     }
 }
