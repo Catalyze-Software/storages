@@ -1,5 +1,6 @@
 use catalyze_shared::group_with_members::{GroupEntry, GroupFilter, GroupSort, GroupWithMembers};
 
+#[allow(dead_code)]
 pub const DATA_KIND: &str = "group";
 
 pub type Key = u64;
