@@ -18,7 +18,7 @@ mod shard_iter;
 mod shard_wasm;
 mod shards;
 
-pub trait IndexConfig<K>: Send + Sync
+pub trait IndexConfigBase<K>: Send + Sync
 where
     K: 'static
         + candid::CandidType
@@ -34,6 +34,26 @@ where
     // storage API
     fn storage_proxies(&self) -> StaticCellStorageRef<Principals>;
 
+    // public API
+    fn proxies(&self) -> impl CellStorage<Principals> {
+        Proxies::new(self.storage_proxies())
+    }
+}
+
+pub trait IndexConfig<K>: IndexConfigBase<K>
+where
+    K: 'static
+        + candid::CandidType
+        + for<'a> candid::Deserialize<'a>
+        + std::hash::Hash
+        + Storable
+        + Ord
+        + Clone
+        + Display
+        + Send
+        + Sync,
+{
+    // storage API
     fn storage_shards(&self) -> StaticCellStorageRef<ShardsIndex>;
     fn storage_shard_iter(&self) -> StaticCellStorageRef<Principal>;
     fn storage_shard_wasm(&self) -> StaticCellStorageRef<Vec<u8>>;
@@ -41,10 +61,6 @@ where
     fn storage_registry(&self) -> StaticStorageRef<K, Principal>;
 
     // public API
-    fn proxies(&self) -> impl CellStorage<Principals> {
-        Proxies::new(self.storage_proxies())
-    }
-
     fn shards(&self) -> impl CellStorage<ShardsIndex> {
         Shards::new(self.storage_shards())
     }
@@ -62,7 +78,7 @@ where
     }
 }
 
-pub trait IndexConfigWithKeyIter: IndexConfig<u64> {
+pub trait IndexConfigWithKeyIter: IndexConfigBase<u64> {
     fn storage_key_iter(&self) -> StaticCellStorageRef<u64>;
 
     fn key_iter(&self) -> impl IDIter {

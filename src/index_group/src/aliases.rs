@@ -1,4 +1,7 @@
-use catalyze_shared::group::{Group, GroupEntry, GroupFilter, GroupSort};
+use catalyze_shared::{
+    group::{Group, GroupEntry},
+    group_with_members::{GroupFilter, GroupSort},
+};
 
 #[allow(dead_code)]
 pub const CANDID_PATH: &str = "index_group";
