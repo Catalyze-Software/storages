@@ -1,9 +1,9 @@
 use candid::{Decode, Principal};
 use catalyze_shared::{
     attendee::Attendee, boosted::Boost, event::Event, event_collection::EventCollection,
-    friend_request::FriendRequest, group::Group, member::Member,
-    member_collection::MemberCollection, notification::Notification, profile::Profile,
-    report::Report, user_notifications::UserNotifications,
+    friend_request::FriendRequest, group::Group, member_collection::MemberCollection,
+    notification::Notification, old_member::Member, profile::Profile, report::Report,
+    user_notifications::UserNotifications,
 };
 
 use crate::{
