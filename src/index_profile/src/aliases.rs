@@ -1,11 +1,13 @@
 use candid::Principal;
-use catalyze_shared::profile::{Profile, ProfileEntry, ProfileFilter, ProfileSort};
+use catalyze_shared::profile_with_refs::{
+    ProfileEntry, ProfileFilter, ProfileSort, ProfileWithRefs,
+};
 
 #[allow(dead_code)]
-pub const CANDID_PATH: &str = "index_profile";
+pub const DATA_KIND: &str = "profile";
 
 pub type Key = Principal;
-pub type Value = Profile;
+pub type Value = ProfileWithRefs;
 pub type Entry = ProfileEntry;
 pub type EntryFilter = ProfileFilter;
 pub type EntrySort = ProfileSort;
