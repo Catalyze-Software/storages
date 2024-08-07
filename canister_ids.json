@@ -4,5 +4,6 @@
   },
   "index_group": {},
   "index_event": {},
+  "index_boosted": {},
   "index_report": {}
 }
