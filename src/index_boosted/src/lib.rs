@@ -1,8 +1,7 @@
 use candid::Principal;
 use catalyze_shared::CanisterResult;
-use common::{queries, ShardsIndex};
+use common::queries;
 use ic_cdk::query;
-use serde_bytes::ByteBuf;
 
 mod aliases;
 mod calls;
@@ -35,7 +34,7 @@ pub fn __export_did_tmp_() -> String {
 #[test]
 pub fn candid() {
     catalyze_shared::candid::save_candid_file(
-        &format!("../../candid/{}.did", crate::aliases::CANDID_PATH),
+        &format!("../../candid/index_{}.did", crate::aliases::DATA_KIND),
         __export_did_tmp_(),
     );
 }
