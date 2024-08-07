@@ -1,10 +1,10 @@
-use common::{queries, CellStorage};
+use common::{queries, CellStorage, ShardController};
 use ic_cdk::{caller, init, query};
-use storage::Index;
 
+mod aliases;
 mod calls;
 mod controller;
-mod storage;
+mod state;
 
 #[query]
 fn icts_name() -> String {
@@ -19,18 +19,17 @@ fn icts_version() -> String {
 // Hacky way to expose the candid interface to the outside world
 #[query(name = "__get_candid_interface_tmp_hack")]
 pub fn __export_did_tmp_() -> String {
-    use candid::{export_service, Principal};
-    use catalyze_shared::{
-        profile::{Profile, ProfileEntry, ProfileFilter},
-        CanisterResult,
-    };
+    use crate::aliases::*;
+    use candid::export_service;
+    use catalyze_shared::CanisterResult;
     export_service!();
     __export_service()
 }
 
 #[init]
 fn init() {
-    Index::default()
+    controller::controller()
+        .index()
         .set(caller())
         .expect("Failed to set index canister ID");
 }
@@ -39,7 +38,7 @@ fn init() {
 #[test]
 pub fn candid() {
     catalyze_shared::candid::save_candid_file(
-        "../../candid/shard_profile.did",
+        &format!("../../candid/shard_{}.did", crate::aliases::DATA_KIND),
         __export_did_tmp_(),
     );
 }

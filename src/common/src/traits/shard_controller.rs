@@ -1,7 +1,10 @@
-use catalyze_shared::{CanisterResult, Filter};
+use candid::Principal;
+use catalyze_shared::{CanisterResult, Filter, StaticStorageRef};
 use ic_stable_structures::Storable;
 
 use crate::ShardStorage;
+
+use super::{CellStorage, StaticCellStorageRef};
 
 pub trait ShardController<K, V, F>
 where
@@ -9,7 +12,19 @@ where
     V: candid::CandidType + 'static + Storable + Clone + Send + Sync,
     F: candid::CandidType + Clone + Filter<K, V>,
 {
-    fn storage(&self) -> impl ShardStorage<K, V>;
+    fn name(&self) -> String;
+
+    fn storage_index(&self) -> StaticCellStorageRef<Principal>;
+
+    fn storage_raw(&self) -> StaticStorageRef<K, V>;
+
+    fn storage(&self) -> impl ShardStorage<K, V> {
+        Storage::new(self.name(), self.storage_raw())
+    }
+
+    fn index(&self) -> impl CellStorage<Principal> {
+        Index::new(self.storage_index())
+    }
 
     fn size(&self) -> CanisterResult<u64> {
         Ok(self.storage().size())
@@ -58,5 +73,62 @@ where
     fn remove_many(&self, keys: Vec<K>) -> CanisterResult<()> {
         self.storage().remove_many(keys);
         Ok(())
+    }
+}
+
+struct Index {
+    name: String,
+    storage: StaticCellStorageRef<Principal>,
+}
+
+impl Index {
+    pub fn new(storage: StaticCellStorageRef<Principal>) -> Self {
+        Self {
+            name: "index".to_owned(),
+            storage,
+        }
+    }
+}
+
+impl CellStorage<Principal> for Index {
+    fn name(&self) -> String {
+        self.name.clone()
+    }
+
+    fn storage(&self) -> StaticCellStorageRef<Principal> {
+        self.storage
+    }
+}
+
+struct Storage<K, V>
+where
+    K: candid::CandidType + 'static + Storable + Ord + Clone + Send + Sync,
+    V: candid::CandidType + 'static + Storable + Clone + Send + Sync,
+{
+    pub name: String,
+    pub raw: StaticStorageRef<K, V>,
+}
+
+impl<K, V> Storage<K, V>
+where
+    K: candid::CandidType + 'static + Storable + Ord + Clone + Send + Sync,
+    V: candid::CandidType + 'static + Storable + Clone + Send + Sync,
+{
+    pub fn new(name: String, raw: StaticStorageRef<K, V>) -> Self {
+        Self { name, raw }
+    }
+}
+
+impl<K, V> ShardStorage<K, V> for Storage<K, V>
+where
+    K: candid::CandidType + 'static + Storable + Ord + Clone + Send + Sync,
+    V: candid::CandidType + 'static + Storable + Clone + Send + Sync,
+{
+    fn name(&self) -> String {
+        self.name.clone()
+    }
+
+    fn storage(&self) -> StaticStorageRef<K, V> {
+        self.raw
     }
 }
