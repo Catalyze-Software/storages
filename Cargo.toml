@@ -16,7 +16,6 @@ futures = "0.3"
 
 catalyze-shared = { git = "https://github.com/Catalyze-Software/catalyze-shared" }
 
-
 [profile.release]
 lto = true
 opt-level = 'z'

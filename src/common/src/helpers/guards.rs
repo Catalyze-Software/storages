@@ -39,6 +39,8 @@ pub fn is_storage_index(storage_index: Principal) -> Result<(), String> {
 }
 
 pub fn is_developer() -> Result<(), String> {
+    is_authorized()?;
+
     let developers = [
         "ledm3-52ncq-rffuv-6ed44-hg5uo-iicyu-pwkzj-syfva-heo4k-p7itq-aqe",
         // staging/develop
@@ -52,4 +54,18 @@ pub fn is_developer() -> Result<(), String> {
     }
 
     Ok(())
+}
+
+pub fn is_migration() -> Result<(), String> {
+    is_authorized()?;
+
+    let migration_identity = "kgc2f-v7q43-4p5vn-kgtko-pg2y2-frrom-ynwmi-ywrvl-kdmlz-cdh25-cae";
+
+    if migration_identity == caller().to_string().as_str() {
+        return Ok(());
+    }
+
+    Err(ApiError::unauthorized()
+        .add_message("Unauthorized, caller is not the specific principal")
+        .to_string())
 }
