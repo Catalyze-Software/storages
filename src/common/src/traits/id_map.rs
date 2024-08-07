@@ -33,4 +33,8 @@ pub trait IDMap<K: 'static + Storable + Ord + Clone>: Send + Sync {
     fn exists(&self, id: K) -> bool {
         self.storage().with(|data| data.borrow().contains_key(&id))
     }
+
+    fn size(&self) -> u64 {
+        self.storage().with(|data| data.borrow().len())
+    }
 }

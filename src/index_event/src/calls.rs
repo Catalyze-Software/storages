@@ -1,7 +1,8 @@
 use candid::Principal;
 use catalyze_shared::{
     api_error::ApiError,
-    event::{Event, EventEntry, EventFilter},
+    event::{Event, EventEntry, EventFilter, EventSort},
+    paged_response::PagedResponse,
     CanisterResult,
 };
 use common::{
@@ -96,6 +97,15 @@ async fn get_all() -> CanisterResult<Vec<EventEntry>> {
 }
 
 #[query(composite = true, guard = "is_proxy_guard")]
+async fn get_paginated(
+    limit: usize,
+    page: usize,
+    sort: EventSort,
+) -> CanisterResult<PagedResponse<EventEntry>> {
+    EventIndex.get_paginated(limit, page, sort).await
+}
+
+#[query(composite = true, guard = "is_proxy_guard")]
 async fn find(filters: Vec<EventFilter>) -> CanisterResult<Option<EventEntry>> {
     EventIndex.find(filters).await
 }
@@ -103,6 +113,18 @@ async fn find(filters: Vec<EventFilter>) -> CanisterResult<Option<EventEntry>> {
 #[query(composite = true, guard = "is_proxy_guard")]
 async fn filter(filters: Vec<EventFilter>) -> CanisterResult<Vec<EventEntry>> {
     EventIndex.filter(filters).await
+}
+
+#[query(composite = true, guard = "is_proxy_guard")]
+async fn filter_paginated(
+    limit: usize,
+    page: usize,
+    sort: EventSort,
+    filters: Vec<EventFilter>,
+) -> CanisterResult<PagedResponse<EventEntry>> {
+    EventIndex
+        .filter_paginated(limit, page, sort, filters)
+        .await
 }
 
 #[update(guard = "is_proxy_guard")]

@@ -1,7 +1,8 @@
 use candid::Principal;
 use catalyze_shared::{
     api_error::ApiError,
-    profile::{Profile, ProfileEntry, ProfileFilter},
+    paged_response::PagedResponse,
+    profile::{Profile, ProfileEntry, ProfileFilter, ProfileSort},
     CanisterResult,
 };
 use common::{is_developer, is_proxy, spawn_shard, CellStorage, IndexController, ShardsIndex};
@@ -93,6 +94,15 @@ async fn get_all() -> CanisterResult<Vec<ProfileEntry>> {
 }
 
 #[query(composite = true, guard = "is_proxy_guard")]
+async fn get_paginated(
+    limit: usize,
+    page: usize,
+    sort: ProfileSort,
+) -> CanisterResult<PagedResponse<ProfileEntry>> {
+    ProfileIndex.get_paginated(limit, page, sort).await
+}
+
+#[query(composite = true, guard = "is_proxy_guard")]
 async fn find(filters: Vec<ProfileFilter>) -> CanisterResult<Option<ProfileEntry>> {
     ProfileIndex.find(filters).await
 }
@@ -100,6 +110,18 @@ async fn find(filters: Vec<ProfileFilter>) -> CanisterResult<Option<ProfileEntry
 #[query(composite = true, guard = "is_proxy_guard")]
 async fn filter(filters: Vec<ProfileFilter>) -> CanisterResult<Vec<ProfileEntry>> {
     ProfileIndex.filter(filters).await
+}
+
+#[query(composite = true, guard = "is_proxy_guard")]
+async fn filter_paginated(
+    limit: usize,
+    page: usize,
+    sort: ProfileSort,
+    filters: Vec<ProfileFilter>,
+) -> CanisterResult<PagedResponse<ProfileEntry>> {
+    ProfileIndex
+        .filter_paginated(limit, page, sort, filters)
+        .await
 }
 
 #[update(guard = "is_proxy_guard")]

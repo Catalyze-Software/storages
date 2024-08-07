@@ -1,0 +1,69 @@
+type ApiError = record {
+  tag : opt text;
+  info : opt vec text;
+  method_name : opt text;
+  message : opt text;
+  timestamp : nat64;
+  error_type : ApiErrorType;
+};
+type ApiErrorType = variant {
+  Duplicate;
+  SerializeError;
+  DeserializeError;
+  NotFound;
+  ValidationError : vec ValidationResponse;
+  Unsupported;
+  Unauthorized;
+  Unexpected;
+  NotImplemented;
+  BadRequest;
+};
+type DateRange = record { end_date : nat64; start_date : nat64 };
+type Report = record {
+  subject : Subject;
+  created_on : nat64;
+  notification_id : opt nat64;
+  group_id : opt nat64;
+  message : text;
+  reported_by : principal;
+};
+type ReportFilter = variant {
+  SubjectType : SubjectType;
+  None;
+  GroupId : nat64;
+  ReportedBy : principal;
+  CreatedOn : DateRange;
+  Subject : Subject;
+};
+type Result = variant { Ok : vec record { nat64; Report }; Err : ApiError };
+type Result_1 = variant { Ok : opt record { nat64; Report }; Err : ApiError };
+type Result_2 = variant { Ok : record { nat64; Report }; Err : ApiError };
+type Result_3 = variant { Ok : bool; Err : ApiError };
+type Result_4 = variant { Ok; Err : ApiError };
+type Result_5 = variant { Ok : nat64; Err : ApiError };
+type Subject = variant {
+  Event : nat64;
+  Group : nat64;
+  Attendee : principal;
+  None;
+  Member : principal;
+  Profile : principal;
+};
+type SubjectType = variant { Event; Group; Attendee; None; Member; Profile };
+type ValidationResponse = record { field : text; message : text };
+service : () -> {
+  __get_candid_interface_tmp_hack : () -> (text) query;
+  filter : (vec ReportFilter) -> (Result) query;
+  find : (vec ReportFilter) -> (Result_1) query;
+  get : (nat64) -> (Result_2) query;
+  get_all : () -> (Result) query;
+  get_many : (vec nat64) -> (Result) query;
+  icts_name : () -> (text) query;
+  icts_version : () -> (text) query;
+  insert : (nat64, Report) -> (Result_2);
+  remove : (nat64) -> (Result_3);
+  remove_many : (vec nat64) -> (Result_4);
+  size : () -> (Result_5) query;
+  update : (nat64, Report) -> (Result_2);
+  update_many : (vec record { nat64; Report }) -> (Result);
+}

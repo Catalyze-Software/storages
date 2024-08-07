@@ -1,8 +1,5 @@
 use candid::Principal;
-use catalyze_shared::{
-    group::{Group, GroupFilter, GroupSort},
-    Sorter,
-};
+use catalyze_shared::group::{Group, GroupFilter, GroupSort};
 use common::{CellStorage, IDMap, IndexController, ShardClient, ShardsIndex};
 
 use crate::storage::{IDs, ShardIter, Shards};
@@ -15,7 +12,7 @@ impl ShardClient<u64, Group, GroupFilter> for GroupShardClient {}
 #[derive(Default)]
 pub struct GroupIndex;
 
-impl IndexController<u64, Group, GroupFilter> for GroupIndex {
+impl IndexController<u64, Group, GroupFilter, GroupSort> for GroupIndex {
     fn shards(&self) -> impl CellStorage<ShardsIndex> {
         Shards::default()
     }
@@ -30,9 +27,5 @@ impl IndexController<u64, Group, GroupFilter> for GroupIndex {
 
     fn client(&self) -> impl ShardClient<u64, Group, GroupFilter> {
         GroupShardClient
-    }
-
-    fn sorter(&self) -> impl Sorter<u64, Group> {
-        GroupSort::default()
     }
 }

@@ -2,13 +2,15 @@ use std::{collections::HashMap, fmt::Display};
 
 use async_trait::async_trait;
 use candid::Principal;
-use catalyze_shared::{api_error::ApiError, CanisterResult, Sorter};
+use catalyze_shared::{
+    api_error::ApiError, paged_response::PagedResponse, CanisterResult, Filter, Sorter,
+};
 use ic_stable_structures::Storable;
 
 use crate::{CellStorage, IDMap, ShardClient, ShardsIndex};
 
 #[async_trait]
-pub trait IndexController<K, V, F>: Send + Sync
+pub trait IndexController<K, V, F, S>: Send + Sync
 where
     K: 'static
         + candid::CandidType
@@ -27,7 +29,8 @@ where
         + Clone
         + Send
         + Sync,
-    F: 'static + candid::CandidType + Clone + Send + Sync,
+    F: 'static + Filter<K, V> + candid::CandidType + Clone + Send + Sync,
+    S: 'static + Sorter<K, V> + Default + candid::CandidType + Clone + Send + Sync,
 {
     /// Shards storage
     fn shards(&self) -> impl CellStorage<ShardsIndex>;
@@ -37,8 +40,6 @@ where
     fn ids(&self) -> impl IDMap<K>;
     /// Shard client
     fn client(&self) -> impl ShardClient<K, V, F>;
-    /// Default sorter for values
-    fn sorter(&self) -> impl Sorter<K, V>;
 
     /// Get the next shard in the round-robin sequence
     fn next_shard(&self) -> CanisterResult<Principal> {
@@ -117,7 +118,6 @@ where
     }
 
     async fn get_all(&self) -> CanisterResult<Vec<(K, V)>> {
-        // TODO: pagination
         let mut res = Vec::new();
         let shards = self.shards().get()?;
 
@@ -126,7 +126,24 @@ where
             res.extend(values);
         }
 
-        Ok(self.sorter().sort(res))
+        Ok(S::default().sort(res))
+    }
+
+    async fn get_paginated(
+        &self,
+        limit: usize,
+        page: usize,
+        sort: S,
+    ) -> CanisterResult<PagedResponse<(K, V)>> {
+        let mut res = Vec::new();
+        let shards = self.shards().get()?;
+
+        for shard in shards.to_vec().iter() {
+            let values = self.client().get_all(shard.id()).await?;
+            res.extend(values);
+        }
+
+        Ok(PagedResponse::new(page, limit, sort.sort(res)))
     }
 
     async fn find(&self, filters: Vec<F>) -> CanisterResult<Option<(K, V)>> {
@@ -143,7 +160,6 @@ where
     }
 
     async fn filter(&self, filters: Vec<F>) -> CanisterResult<Vec<(K, V)>> {
-        // TODO: pagination
         let mut res = Vec::new();
         let shards = self.shards().get()?;
 
@@ -152,7 +168,25 @@ where
             res.extend(values);
         }
 
-        Ok(self.sorter().sort(res))
+        Ok(S::default().sort(res))
+    }
+
+    async fn filter_paginated(
+        &self,
+        limit: usize,
+        page: usize,
+        sort: S,
+        filters: Vec<F>,
+    ) -> CanisterResult<PagedResponse<(K, V)>> {
+        let mut res = Vec::new();
+        let shards = self.shards().get()?;
+
+        for shard in shards.to_vec().iter() {
+            let values = self.client().filter(shard.id(), filters.clone()).await?;
+            res.extend(values);
+        }
+
+        Ok(PagedResponse::new(page, limit, sort.sort(res)))
     }
 
     async fn insert(&self, key: K, value: V) -> CanisterResult<(K, V)> {
