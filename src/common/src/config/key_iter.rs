@@ -1,22 +1,20 @@
-use common::{CellStorage, IDIter, StaticCellStorageRef};
+use crate::{CellStorage, IDIter, StaticCellStorageRef};
 
-use super::state::ID_ITER;
-
-pub struct IDIterator {
+pub struct KeyIter {
     name: String,
     storage: StaticCellStorageRef<u64>,
 }
 
-impl Default for IDIterator {
-    fn default() -> Self {
+impl KeyIter {
+    pub fn new(storage: StaticCellStorageRef<u64>) -> Self {
         Self {
             name: "id_iter".to_owned(),
-            storage: &ID_ITER,
+            storage,
         }
     }
 }
 
-impl CellStorage<u64> for IDIterator {
+impl CellStorage<u64> for KeyIter {
     fn name(&self) -> String {
         self.name.clone()
     }
@@ -26,4 +24,4 @@ impl CellStorage<u64> for IDIterator {
     }
 }
 
-impl IDIter for IDIterator {}
+impl IDIter for KeyIter {}

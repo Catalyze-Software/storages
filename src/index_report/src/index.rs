@@ -1,38 +1,21 @@
-use candid::Principal;
-use catalyze_shared::{
-    report::{Report, ReportFilter, ReportSort},
-    Sorter,
+use common::{IndexConfig, IndexController};
+
+use crate::{
+    aliases::{EntryFilter, EntrySort, Key, Value},
+    config::Config,
 };
-use common::{CellStorage, IDMap, IndexController, ShardClient, ShardsIndex};
-
-use crate::storage::{IDs, ShardIter, Shards};
 
 #[derive(Default)]
-pub struct ReportShardClient;
+pub struct Index {
+    config: Config,
+}
 
-impl ShardClient<u64, Report, ReportFilter> for ReportShardClient {}
-
-#[derive(Default)]
-pub struct ReportIndex;
-
-impl IndexController<u64, Report, ReportFilter> for ReportIndex {
-    fn shards(&self) -> impl CellStorage<ShardsIndex> {
-        Shards::default()
+impl IndexController<Key, Value, EntryFilter, EntrySort> for Index {
+    fn config(&self) -> impl IndexConfig<Key> {
+        self.config.clone()
     }
+}
 
-    fn shard_iter(&self) -> impl CellStorage<Principal> {
-        ShardIter::default()
-    }
-
-    fn ids(&self) -> impl IDMap<u64> {
-        IDs::default()
-    }
-
-    fn client(&self) -> impl ShardClient<u64, Report, ReportFilter> {
-        ReportShardClient
-    }
-
-    fn sorter(&self) -> impl Sorter<u64, Report> {
-        ReportSort::default()
-    }
+pub fn index() -> Index {
+    Index::default()
 }

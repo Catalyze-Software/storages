@@ -1,17 +1,15 @@
-use common::{CellStorage, Principals, StaticCellStorageRef};
-
-use super::state::PROXIES;
+use crate::{CellStorage, Principals, StaticCellStorageRef};
 
 pub struct Proxies {
     name: String,
     storage: StaticCellStorageRef<Principals>,
 }
 
-impl Default for Proxies {
-    fn default() -> Self {
+impl Proxies {
+    pub fn new(storage: StaticCellStorageRef<Principals>) -> Self {
         Self {
             name: "proxies".to_owned(),
-            storage: &PROXIES,
+            storage,
         }
     }
 }

@@ -1,38 +1,21 @@
-use candid::Principal;
-use catalyze_shared::{
-    profile::{Profile, ProfileFilter, ProfileSort},
-    Sorter,
+use common::{IndexConfig, IndexController};
+
+use crate::{
+    aliases::{EntryFilter, EntrySort, Key, Value},
+    config::Config,
 };
-use common::{CellStorage, IDMap, IndexController, ShardClient, ShardsIndex};
-
-use crate::storage::{IDs, ShardIter, Shards};
 
 #[derive(Default)]
-pub struct ProfileShardClient;
+pub struct Index {
+    config: Config,
+}
 
-impl ShardClient<Principal, Profile, ProfileFilter> for ProfileShardClient {}
-
-#[derive(Default)]
-pub struct ProfileIndex;
-
-impl IndexController<Principal, Profile, ProfileFilter> for ProfileIndex {
-    fn shards(&self) -> impl CellStorage<ShardsIndex> {
-        Shards::default()
+impl IndexController<Key, Value, EntryFilter, EntrySort> for Index {
+    fn config(&self) -> impl IndexConfig<Key> {
+        self.config.clone()
     }
+}
 
-    fn shard_iter(&self) -> impl CellStorage<Principal> {
-        ShardIter::default()
-    }
-
-    fn ids(&self) -> impl IDMap<Principal> {
-        IDs::default()
-    }
-
-    fn client(&self) -> impl ShardClient<Principal, Profile, ProfileFilter> {
-        ProfileShardClient
-    }
-
-    fn sorter(&self) -> impl Sorter<Principal, Profile> {
-        ProfileSort::default()
-    }
+pub fn index() -> Index {
+    Index::default()
 }
