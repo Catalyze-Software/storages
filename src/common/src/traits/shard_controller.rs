@@ -100,7 +100,7 @@ impl CellStorage<Principal> for Index {
     }
 }
 
-struct Storage<K, V>
+pub(crate) struct Storage<K, V>
 where
     K: candid::CandidType + 'static + Storable + Ord + Clone + Send + Sync,
     V: candid::CandidType + 'static + Storable + Clone + Send + Sync,

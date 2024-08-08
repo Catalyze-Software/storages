@@ -13,6 +13,10 @@ where
         self.storage().with(|data| data.borrow().len())
     }
 
+    fn exists(&self, key: K) -> bool {
+        self.storage().with(|data| data.borrow().contains_key(&key))
+    }
+
     fn insert_by_key(&self, key: K, value: V) -> CanisterResult<(K, V)> {
         self.storage().with(|data| {
             if data.borrow().contains_key(&key) {

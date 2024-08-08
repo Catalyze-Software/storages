@@ -2,7 +2,7 @@ use candid::Principal;
 use catalyze_shared::{api_error::ApiError, paged_response::PagedResponse, CanisterResult};
 use common::{
     controller, is_developer, is_migration, is_proxy, spawn_shard, CellStorage, IDIter,
-    IndexConfig, IndexConfigWithKeyIter, IndexController, ShardsIndex,
+    IndexConfig, IndexConfigBase, IndexConfigWithKeyIter, IndexController, ShardsIndex,
 };
 use ic_cdk::{init, query, trap, update};
 use serde_bytes::ByteBuf;
