@@ -261,7 +261,7 @@ dependencies = [
 [[package]]
 name = "catalyze-shared"
 version = "0.1.0"
-source = "git+https://github.com/Catalyze-Software/catalyze-shared?branch=feat/boosted#b3b20c30308849f247370fb9df4a3177109f7143"
+source = "git+https://github.com/Catalyze-Software/catalyze-shared#86168ae14c85c2d769908de4b3c2b9e0cf5dc45e"
 dependencies = [
  "candid",
  "email_address",
