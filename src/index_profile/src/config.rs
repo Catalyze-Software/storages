@@ -1,6 +1,6 @@
 use candid::Principal;
-use catalyze_shared::StaticStorageRef;
-use common::{IndexConfig, IndexConfigBase, Principals, ShardsIndex, StaticCellStorageRef};
+use catalyze_shared::{StaticCellStorageRef, StaticStorageRef};
+use common::{IndexConfig, IndexConfigBase, Principals, ShardsIndex};
 
 use crate::{aliases::Key, state::*};
 

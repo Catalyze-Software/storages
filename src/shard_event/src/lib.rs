@@ -1,4 +1,5 @@
-use common::{queries, CellStorage, ShardController};
+use catalyze_shared::CellStorage;
+use common::{queries, ShardController};
 use ic_cdk::{caller, init, query};
 
 mod aliases;

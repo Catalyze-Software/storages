@@ -1,10 +1,10 @@
 use candid::Principal;
-use catalyze_shared::{CanisterResult, Filter, StaticStorageRef};
+use catalyze_shared::{
+    CanisterResult, CellStorage, Filter, GenericCellStorage, StaticCellStorageRef, StaticStorageRef,
+};
 use ic_stable_structures::Storable;
 
 use crate::ShardStorage;
-
-use super::{CellStorage, StaticCellStorageRef};
 
 pub trait ShardController<K, V, F>
 where
@@ -23,7 +23,7 @@ where
     }
 
     fn index(&self) -> impl CellStorage<Principal> {
-        Index::new(self.storage_index())
+        GenericCellStorage::new("index", self.storage_index())
     }
 
     fn size(&self) -> CanisterResult<u64> {
@@ -73,30 +73,6 @@ where
     fn remove_many(&self, keys: Vec<K>) -> CanisterResult<()> {
         self.storage().remove_many(keys);
         Ok(())
-    }
-}
-
-struct Index {
-    name: String,
-    storage: StaticCellStorageRef<Principal>,
-}
-
-impl Index {
-    pub fn new(storage: StaticCellStorageRef<Principal>) -> Self {
-        Self {
-            name: "index".to_owned(),
-            storage,
-        }
-    }
-}
-
-impl CellStorage<Principal> for Index {
-    fn name(&self) -> String {
-        self.name.clone()
-    }
-
-    fn storage(&self) -> StaticCellStorageRef<Principal> {
-        self.storage
     }
 }
 

@@ -1,4 +1,5 @@
-use common::{IndexConfigBase, IndexConfigWithKeyIter, Principals, StaticCellStorageRef};
+use catalyze_shared::StaticCellStorageRef;
+use common::{IndexConfigBase, IndexConfigWithKeyIter, Principals};
 
 use crate::{aliases::Key, state::*};
 
