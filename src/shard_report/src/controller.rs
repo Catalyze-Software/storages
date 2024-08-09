@@ -1,6 +1,6 @@
 use candid::Principal;
-use catalyze_shared::StaticStorageRef;
-use common::{ShardController, StaticCellStorageRef};
+use catalyze_shared::{StaticCellStorageRef, StaticStorageRef};
+use common::ShardController;
 
 use crate::{
     aliases::{EntryFilter, Key, Value, DATA_KIND},

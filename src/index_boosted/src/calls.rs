@@ -1,7 +1,7 @@
 use candid::Principal;
-use catalyze_shared::{paged_response::PagedResponse, CanisterResult};
+use catalyze_shared::{paged_response::PagedResponse, CanisterResult, CellStorage};
 use common::{
-    controller, is_developer, is_migration, is_proxy, CellStorage, IDIter, IndexConfigBase,
+    controller, is_developer, is_migration, is_proxy, IDIter, IndexConfigBase,
     IndexConfigWithKeyIter, IndexControllerStateful,
 };
 use ic_cdk::{init, query, trap, update};

@@ -1,6 +1,4 @@
-use catalyze_shared::CanisterResult;
-
-use super::CellStorage;
+use catalyze_shared::{CanisterResult, CellStorage};
 
 pub trait IDIter: CellStorage<u64> {
     fn next(&self) -> CanisterResult<u64> {
