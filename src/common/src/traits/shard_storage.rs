@@ -44,6 +44,11 @@ where
         })
     }
 
+    fn get_opt(&self, key: K) -> Option<(K, V)> {
+        self.storage()
+            .with(|data| data.borrow().get(&key).map(|value| (key, value)))
+    }
+
     fn get_many(&self, keys: Vec<K>) -> Vec<(K, V)> {
         self.storage().with(|data| {
             let mut entities = Vec::new();
@@ -89,6 +94,13 @@ where
                     .add_message("Key does not exist"));
             }
 
+            data.borrow_mut().insert(key.clone(), value.clone());
+            Ok((key, value))
+        })
+    }
+
+    fn upsert(&self, key: K, value: V) -> CanisterResult<(K, V)> {
+        self.storage().with(|data| {
             data.borrow_mut().insert(key.clone(), value.clone());
             Ok((key, value))
         })

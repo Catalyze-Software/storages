@@ -3,8 +3,8 @@ use catalyze_shared::{
     api_error::ApiError, paged_response::PagedResponse, CanisterResult, CellStorage,
 };
 use common::{
-    controller, is_developer, is_migration, is_proxy, spawn_shard, IDIter, IndexConfig,
-    IndexConfigBase, IndexConfigWithKeyIter, IndexController, ShardsIndex,
+    controller, is_developer, is_migration, is_proxy, spawn_shard, IndexConfig, IndexConfigBase,
+    IndexConfigWithKeyIter, IndexController, ShardsIndex,
 };
 use ic_cdk::{init, query, trap, update};
 use serde_bytes::ByteBuf;
@@ -128,32 +128,34 @@ async fn filter_paginated(
 
 #[update(guard = "is_proxy_guard")]
 async fn insert(value: Value) -> CanisterResult<Entry> {
-    controller()
-        .insert(config().key_iter().next()?, value)
-        .await
+    controller().add_event(value).await
 }
 
 #[update(guard = "is_migration")]
 async fn insert_by_key(key: Key, value: Value) -> CanisterResult<Entry> {
-    controller::insert_by_key(controller(), config().key_iter(), key, value).await
+    let (key, value) =
+        controller::insert_by_key(controller(), config().key_iter(), key, value).await?;
+
+    controller().handle_new_event(key, value.clone())?;
+    Ok((key, value))
 }
 
 #[update(guard = "is_proxy_guard")]
 async fn update(key: Key, value: Value) -> CanisterResult<Entry> {
-    controller().update(key, value).await
+    controller().update_event(key, value).await
 }
 
 #[update(guard = "is_proxy_guard")]
 async fn update_many(list: Vec<Entry>) -> CanisterResult<Vec<Entry>> {
-    controller().update_many(list).await
+    controller().update_many_events(list).await
 }
 
 #[update(guard = "is_proxy_guard")]
 async fn remove(key: Key) -> CanisterResult<bool> {
-    controller().remove(key).await
+    controller().remove_event(key).await
 }
 
 #[update(guard = "is_proxy_guard")]
 async fn remove_many(keys: Vec<Key>) -> CanisterResult<()> {
-    controller().remove_many(keys).await
+    controller().remove_many_events(keys).await
 }
