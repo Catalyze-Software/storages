@@ -2,8 +2,10 @@ use std::collections::HashMap;
 
 use candid::Principal;
 use catalyze_shared::{
-    attendee::AttendeeEntry, event_collection::EventCollectionEntry,
-    event_with_attendees::EventWithAttendees, CanisterResult,
+    attendee::{Attendee, AttendeeEntry, AttendeeInvite},
+    event_collection::EventCollectionEntry,
+    event_with_attendees::EventWithAttendees,
+    CanisterResult,
 };
 use common::{IDIter, IndexConfig, IndexConfigWithKeyIter, IndexController, ShardStorage};
 
@@ -24,6 +26,10 @@ impl IndexController<Key, Value, EntryFilter, EntrySort> for Controller {
 }
 
 impl Controller {
+    pub fn attendees(&self) -> impl ShardStorage<Principal, Attendee> {
+        self.config.attendees()
+    }
+
     pub async fn add_event(&self, value: Value) -> CanisterResult<(Key, Value)> {
         let key = self.config.key_iter().next()?;
         let resp = self.insert(key, value.clone()).await?;

@@ -1,10 +1,11 @@
 use candid::Principal;
 use catalyze_shared::{
-    api_error::ApiError, paged_response::PagedResponse, CanisterResult, CellStorage,
+    api_error::ApiError, attendee::AttendeeEntry, paged_response::PagedResponse, CanisterResult,
+    CellStorage,
 };
 use common::{
     controller, is_developer, is_migration, is_proxy, spawn_shard, IndexConfig, IndexConfigBase,
-    IndexConfigWithKeyIter, IndexController, ShardsIndex,
+    IndexConfigWithKeyIter, IndexController, ShardStorage, ShardsIndex,
 };
 use ic_cdk::{init, query, trap, update};
 use serde_bytes::ByteBuf;
@@ -158,4 +159,9 @@ async fn remove(key: Key) -> CanisterResult<bool> {
 #[update(guard = "is_proxy_guard")]
 async fn remove_many(keys: Vec<Key>) -> CanisterResult<()> {
     controller().remove_many_events(keys).await
+}
+
+#[update(guard = "is_proxy_guard")]
+async fn get_attendee(attendee: Principal) -> CanisterResult<AttendeeEntry> {
+    controller().attendees().get(attendee)
 }
