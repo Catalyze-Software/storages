@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use candid::Principal;
 use catalyze_shared::{
-    attendee::{Attendee, AttendeeEntry, AttendeeInvite},
+    attendee::{Attendee, AttendeeEntry},
     event_collection::EventCollectionEntry,
     event_with_attendees::EventWithAttendees,
     CanisterResult,
