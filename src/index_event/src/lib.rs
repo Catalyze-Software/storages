@@ -25,7 +25,10 @@ fn icts_version() -> String {
 pub fn __export_did_tmp_() -> String {
     use crate::aliases::*;
     use candid::export_service;
-    use catalyze_shared::{attendee::AttendeeEntry, paged_response::PagedResponse};
+    use catalyze_shared::{
+        attendee::AttendeeEntry, event_collection::EventCollectionEntry,
+        paged_response::PagedResponse,
+    };
 
     export_service!();
     __export_service()

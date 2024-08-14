@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use candid::Principal;
 use catalyze_shared::{
     attendee::{Attendee, AttendeeEntry},
-    event_collection::EventCollectionEntry,
+    event_collection::{EventCollection, EventCollectionEntry},
     event_with_attendees::EventWithAttendees,
     CanisterResult,
 };
@@ -28,6 +28,10 @@ impl IndexController<Key, Value, EntryFilter, EntrySort> for Controller {
 impl Controller {
     pub fn attendees(&self) -> impl ShardStorage<Principal, Attendee> {
         self.config.attendees()
+    }
+
+    pub fn group_events(&self) -> impl ShardStorage<u64, EventCollection> {
+        self.config.group_events()
     }
 
     pub async fn add_event(&self, value: Value) -> CanisterResult<(Key, Value)> {
