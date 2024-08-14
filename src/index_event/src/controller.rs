@@ -43,19 +43,21 @@ impl Controller {
 
     pub async fn remove_event(&self, key: Key) -> CanisterResult<bool> {
         let (key, value) = self.get(key).await?;
+        let resp = self.remove(key).await?;
         self.handle_remove_event(key, value)?;
-        self.remove(key).await
+        Ok(resp)
     }
 
     pub async fn remove_many_events(&self, keys: Vec<Key>) -> CanisterResult<()> {
         let events = self.get_many(keys.clone()).await?;
+        controller().remove_many(keys).await?;
 
         events.iter().try_for_each(|(key, value)| {
             self.handle_remove_event(*key, value.clone())?;
             Ok(())
         })?;
 
-        controller().remove_many(keys).await
+        Ok(())
     }
 
     pub async fn update_event(&self, key: Key, new: Value) -> CanisterResult<(Key, Value)> {
@@ -95,7 +97,7 @@ impl Controller {
         })?;
 
         let (_, mut group_events) = self.get_group_events(group_id);
-        group_events.add_event(key);
+        group_events.add_event(key); // TODO: should be removed and stored in the groupwithmembers
         self.config.group_events().upsert(group_id, group_events)?;
 
         Ok(())
