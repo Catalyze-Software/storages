@@ -190,6 +190,10 @@ impl Controller {
                 continue;
             }
 
+            if join.roles == member.get_roles(key) {
+                continue;
+            }
+
             member.replace_roles(&key, join.roles.clone());
             self.config.members().upsert(*id, member)?;
         }
