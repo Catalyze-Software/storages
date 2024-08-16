@@ -132,6 +132,11 @@ async fn get_member(member: Principal) -> CanisterResult<MemberEntry> {
     controller().members().get(member)
 }
 
+#[query(guard = "is_proxy_guard")]
+async fn get_many_members(members: Vec<Principal>) -> CanisterResult<Vec<MemberEntry>> {
+    Ok(controller().members().get_many(members))
+}
+
 #[update(guard = "is_proxy_guard")]
 async fn insert(value: Value) -> CanisterResult<Entry> {
     controller().add_group(value).await
