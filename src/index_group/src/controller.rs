@@ -133,6 +133,11 @@ impl Controller {
             .filter(|(id, _)| !new_members.contains_key(id))
             .collect::<HashMap<_, _>>();
 
+        let members_to_update = current_members
+            .iter()
+            .filter(|(id, _)| new_members.contains_key(id))
+            .collect::<HashMap<_, _>>();
+
         for (id, invite) in invited_to_add {
             let (_, mut member) = self.get_member(*id);
 
@@ -175,6 +180,17 @@ impl Controller {
             }
 
             member.remove_joined(key);
+            self.config.members().upsert(*id, member)?;
+        }
+
+        for (id, join) in members_to_update {
+            let (_, mut member) = self.get_member(*id);
+
+            if !member.is_group_joined(&key) {
+                continue;
+            }
+
+            member.replace_roles(&key, join.roles.clone());
             self.config.members().upsert(*id, member)?;
         }
 

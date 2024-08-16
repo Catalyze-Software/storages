@@ -1,7 +1,7 @@
 use candid::Principal;
 use catalyze_shared::{
-    api_error::ApiError, attendee::AttendeeEntry, event_collection::EventCollectionEntry,
-    paged_response::PagedResponse, CanisterResult, CellStorage,
+    api_error::ApiError, attendee::AttendeeEntry, paged_response::PagedResponse, CanisterResult,
+    CellStorage,
 };
 use common::{
     controller, is_developer, is_migration, is_proxy, spawn_shard, IndexConfig, IndexConfigBase,
@@ -118,11 +118,6 @@ async fn filter(filters: Vec<EntryFilter>) -> CanisterResult<Vec<Entry>> {
 #[query(guard = "is_proxy_guard")]
 async fn get_attendee(attendee: Principal) -> CanisterResult<AttendeeEntry> {
     controller().attendees().get(attendee)
-}
-
-#[query(guard = "is_proxy_guard")]
-async fn get_group_events(group_id: u64) -> CanisterResult<EventCollectionEntry> {
-    controller().group_events().get(group_id)
 }
 
 #[query(composite = true, guard = "is_proxy_guard")]

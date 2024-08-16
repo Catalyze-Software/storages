@@ -1,7 +1,5 @@
 use candid::Principal;
-use catalyze_shared::{
-    attendee::Attendee, event_collection::EventCollection, StaticCellStorageRef, StaticStorageRef,
-};
+use catalyze_shared::{attendee::Attendee, StaticCellStorageRef, StaticStorageRef};
 use common::{
     IndexConfig, IndexConfigBase, IndexConfigWithKeyIter, Principals, ShardStorage, ShardsIndex,
     Storage,
@@ -19,7 +17,6 @@ pub struct Config {
     key_iter: StaticCellStorageRef<Key>,
 
     attendees: StaticStorageRef<Principal, Attendee>,
-    group_events: StaticStorageRef<u64, EventCollection>,
 }
 
 impl Default for Config {
@@ -33,7 +30,6 @@ impl Default for Config {
             key_iter: &KEY_ITER,
 
             attendees: &ATTENDEES,
-            group_events: &GROUP_EVENTS,
         }
     }
 }
@@ -71,10 +67,6 @@ impl IndexConfigWithKeyIter for Config {
 impl Config {
     pub fn attendees(&self) -> impl ShardStorage<Principal, Attendee> {
         Storage::new("attendees", self.attendees)
-    }
-
-    pub fn group_events(&self) -> impl ShardStorage<u64, EventCollection> {
-        Storage::new("group_events", self.group_events)
     }
 }
 

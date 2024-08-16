@@ -3,7 +3,6 @@ use std::collections::HashMap;
 use candid::Principal;
 use catalyze_shared::{
     attendee::{Attendee, AttendeeEntry},
-    event_collection::{EventCollection, EventCollectionEntry},
     event_with_attendees::EventWithAttendees,
     CanisterResult,
 };
@@ -28,10 +27,6 @@ impl IndexController<Key, Value, EntryFilter, EntrySort> for Controller {
 impl Controller {
     pub fn attendees(&self) -> impl ShardStorage<Principal, Attendee> {
         self.config.attendees()
-    }
-
-    pub fn group_events(&self) -> impl ShardStorage<u64, EventCollection> {
-        self.config.group_events()
     }
 
     pub async fn add_event(&self, value: Value) -> CanisterResult<(Key, Value)> {
@@ -96,10 +91,6 @@ impl Controller {
             Ok(())
         })?;
 
-        let (_, mut group_events) = self.get_group_events(group_id);
-        group_events.add_event(key); // TODO: should be removed and stored in the groupwithmembers
-        self.config.group_events().upsert(group_id, group_events)?;
-
         Ok(())
     }
 
@@ -117,11 +108,6 @@ impl Controller {
             self.config.attendees().upsert(*id, attendee)?;
             Ok(())
         })?;
-
-        let group_id = value.group_id.expect("Group ID not set"); // TODO: FIX DIS
-        let (_, mut group_events) = self.get_group_events(group_id);
-        group_events.remove_event(&key);
-        self.config.group_events().upsert(group_id, group_events)?;
 
         Ok(())
     }
@@ -211,13 +197,6 @@ impl Controller {
             .attendees()
             .get_opt(id)
             .unwrap_or_else(|| (id, Default::default()))
-    }
-
-    fn get_group_events(&self, group_id: u64) -> EventCollectionEntry {
-        self.config
-            .group_events()
-            .get_opt(group_id)
-            .unwrap_or_else(|| (group_id, Default::default()))
     }
 }
 

@@ -1,7 +1,6 @@
 use candid::Principal;
 use catalyze_shared::{
     attendee::Attendee,
-    event_collection::EventCollection,
     state::{init_btree, init_cell, init_memory_manager},
     CellStorageRef, MemoryManagerStorage, StorageRef,
 };
@@ -18,7 +17,6 @@ pub static SHARD_WASM_MEMORY_ID: MemoryId = MemoryId::new(4);
 pub static REGISTRY_MEMORY_ID: MemoryId = MemoryId::new(5);
 
 pub static ATTENDEES_MEMORY_ID: MemoryId = MemoryId::new(6);
-pub static GROUP_EVENTS_MEMORY_ID: MemoryId = MemoryId::new(7);
 
 thread_local! {
     pub static MEMORY_MANAGER: MemoryManagerStorage = init_memory_manager();
@@ -30,5 +28,4 @@ thread_local! {
     pub static REGISTRY: StorageRef<Key, Principal> = init_btree(&MEMORY_MANAGER, REGISTRY_MEMORY_ID);
 
     pub static ATTENDEES: StorageRef<Principal, Attendee> = init_btree(&MEMORY_MANAGER, ATTENDEES_MEMORY_ID);
-    pub static GROUP_EVENTS: StorageRef<u64, EventCollection> = init_btree(&MEMORY_MANAGER, GROUP_EVENTS_MEMORY_ID);
 }
