@@ -1,6 +1,5 @@
 use candid::Principal;
 use catalyze_shared::{
-    attendee::Attendee,
     state::{init_btree, init_cell, init_memory_manager},
     CellStorageRef, MemoryManagerStorage, StorageRef,
 };
@@ -16,8 +15,6 @@ pub static SHARD_ITER_MEMORY_ID: MemoryId = MemoryId::new(3);
 pub static SHARD_WASM_MEMORY_ID: MemoryId = MemoryId::new(4);
 pub static REGISTRY_MEMORY_ID: MemoryId = MemoryId::new(5);
 
-pub static ATTENDEES_MEMORY_ID: MemoryId = MemoryId::new(6);
-
 thread_local! {
     pub static MEMORY_MANAGER: MemoryManagerStorage = init_memory_manager();
     pub static PROXIES: CellStorageRef<Principals> = init_cell(&MEMORY_MANAGER, "proxies", PROXIES_MEMORY_ID);
@@ -26,6 +23,4 @@ thread_local! {
     pub static KEY_ITER: CellStorageRef<Key> = init_cell(&MEMORY_MANAGER, "key_iter", KEY_ITER_MEMORY_ID);
     pub static SHARD_WASM: CellStorageRef<Vec<u8>> = init_cell(&MEMORY_MANAGER, "shards_wasm", SHARD_WASM_MEMORY_ID);
     pub static REGISTRY: StorageRef<Key, Principal> = init_btree(&MEMORY_MANAGER, REGISTRY_MEMORY_ID);
-
-    pub static ATTENDEES: StorageRef<Principal, Attendee> = init_btree(&MEMORY_MANAGER, ATTENDEES_MEMORY_ID);
 }

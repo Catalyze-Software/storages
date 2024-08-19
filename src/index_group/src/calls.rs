@@ -1,11 +1,10 @@
 use candid::Principal;
 use catalyze_shared::{
-    api_error::ApiError, old_member::MemberEntry, paged_response::PagedResponse, CanisterResult,
-    CellStorage,
+    api_error::ApiError, paged_response::PagedResponse, CanisterResult, CellStorage,
 };
 use common::{
-    controller, is_developer, is_migration, is_proxy, spawn_shard, IndexConfig, IndexConfigBase,
-    IndexConfigWithKeyIter, IndexController, ShardStorage, ShardsIndex,
+    controller, is_developer, is_migration, is_proxy, spawn_shard, IDIter, IndexConfig,
+    IndexConfigBase, IndexConfigWithKeyIter, IndexController, ShardsIndex,
 };
 use ic_cdk::{init, query, trap, update};
 use serde_bytes::ByteBuf;
@@ -127,46 +126,34 @@ async fn filter_paginated(
         .await
 }
 
-#[query(guard = "is_proxy_guard")]
-async fn get_member(member: Principal) -> CanisterResult<MemberEntry> {
-    controller().members().get(member)
-}
-
-#[query(guard = "is_proxy_guard")]
-async fn get_many_members(members: Vec<Principal>) -> CanisterResult<Vec<MemberEntry>> {
-    Ok(controller().members().get_many(members))
-}
-
 #[update(guard = "is_proxy_guard")]
 async fn insert(value: Value) -> CanisterResult<Entry> {
-    controller().add_group(value).await
+    controller()
+        .insert(config().key_iter().next()?, value)
+        .await
 }
 
 #[update(guard = "is_migration")]
 async fn insert_by_key(key: Key, value: Value) -> CanisterResult<Entry> {
-    let (key, value) =
-        controller::insert_by_key(controller(), config().key_iter(), key, value).await?;
-
-    controller().handle_new_group(key, value.clone())?;
-    Ok((key, value))
+    controller::insert_by_key(controller(), config().key_iter(), key, value).await
 }
 
 #[update(guard = "is_proxy_guard")]
 async fn update(key: Key, value: Value) -> CanisterResult<Entry> {
-    controller().update_group(key, value).await
+    controller().update(key, value).await
 }
 
 #[update(guard = "is_proxy_guard")]
 async fn update_many(list: Vec<Entry>) -> CanisterResult<Vec<Entry>> {
-    controller().update_many_groups(list).await
+    controller().update_many(list).await
 }
 
 #[update(guard = "is_proxy_guard")]
 async fn remove(key: Key) -> CanisterResult<bool> {
-    controller().remove_group(key).await
+    controller().remove(key).await
 }
 
 #[update(guard = "is_proxy_guard")]
 async fn remove_many(keys: Vec<Key>) -> CanisterResult<()> {
-    controller().remove_many_groups(keys).await
+    controller().remove_many(keys).await
 }

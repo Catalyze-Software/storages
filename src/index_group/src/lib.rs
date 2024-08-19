@@ -25,7 +25,7 @@ fn icts_version() -> String {
 pub fn __export_did_tmp_() -> String {
     use crate::aliases::*;
     use candid::export_service;
-    use catalyze_shared::{old_member::MemberEntry, paged_response::PagedResponse};
+    use catalyze_shared::paged_response::PagedResponse;
 
     export_service!();
     __export_service()

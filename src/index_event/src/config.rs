@@ -1,9 +1,6 @@
 use candid::Principal;
-use catalyze_shared::{attendee::Attendee, StaticCellStorageRef, StaticStorageRef};
-use common::{
-    IndexConfig, IndexConfigBase, IndexConfigWithKeyIter, Principals, ShardStorage, ShardsIndex,
-    Storage,
-};
+use catalyze_shared::{StaticCellStorageRef, StaticStorageRef};
+use common::{IndexConfig, IndexConfigBase, IndexConfigWithKeyIter, Principals, ShardsIndex};
 
 use crate::{aliases::Key, state::*};
 
@@ -15,8 +12,6 @@ pub struct Config {
     shard_wasm: StaticCellStorageRef<Vec<u8>>,
     registry: StaticStorageRef<Key, Principal>,
     key_iter: StaticCellStorageRef<Key>,
-
-    attendees: StaticStorageRef<Principal, Attendee>,
 }
 
 impl Default for Config {
@@ -28,8 +23,6 @@ impl Default for Config {
             shard_wasm: &SHARD_WASM,
             registry: &REGISTRY,
             key_iter: &KEY_ITER,
-
-            attendees: &ATTENDEES,
         }
     }
 }
@@ -61,12 +54,6 @@ impl IndexConfig<Key> for Config {
 impl IndexConfigWithKeyIter for Config {
     fn storage_key_iter(&self) -> StaticCellStorageRef<Key> {
         self.key_iter
-    }
-}
-
-impl Config {
-    pub fn attendees(&self) -> impl ShardStorage<Principal, Attendee> {
-        Storage::new("attendees", self.attendees)
     }
 }
 
