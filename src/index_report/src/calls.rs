@@ -33,6 +33,11 @@ fn init(proxies: Vec<Principal>) {
         .expect("Failed to set proxies");
 }
 
+#[query(guard = "is_proxy_guard")]
+fn _dev_get_shards() -> CanisterResult<ShardsIndex> {
+    config().shards().get()
+}
+
 #[update(guard = "is_proxy_guard")]
 async fn _dev_extend_shards(shards: u64) -> CanisterResult<ShardsIndex> {
     let shard_ids = config().shards().get().unwrap_or_default();
