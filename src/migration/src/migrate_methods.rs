@@ -234,9 +234,10 @@ impl Migrate {
         migrate("events", mapped.into_iter().collect(), None).await
     }
 
-    // pub async fn reports() -> eyre::Result<(u32, u32)> {
-    //     migrate("reports", vec![], None).await
-    // }
+    pub async fn reports() -> eyre::Result<(u32, u32)> {
+        let proxy_reports = ProxyCalls::get_reports().await?;
+        migrate("reports", proxy_reports, None).await
+    }
 
     // pub async fn friend_requests() -> eyre::Result<(u32, u32)> {
     //     migrate("friend_requests", vec![], None).await
@@ -250,14 +251,14 @@ impl Migrate {
         let profiles = Migrate::profiles().await?;
         let groups = Migrate::groups().await?;
         let events = Migrate::events().await?;
-        // let reports = Migrate::reports().await?;
+        let reports = Migrate::reports().await?;
         // let friend_requests = Migrate::friend_requests().await?;
         // let notifications = Migrate::notifications().await?;
 
-        // println!(
-        //     "Migration completed: profiles: {:?}, groups: {:?}, events: {:?}, reports: {:?}, members: {:?}, attendees: {:?}, friend_requests: {:?}, notifications: {:?}",
-        //     profiles, groups, events, reports, members, attendees, friend_requests, notifications
-        // );
+        println!(
+            "Migration completed: profiles: {:?}, groups: {:?}, events: {:?}, reports: {:?}",
+            profiles, groups, events, reports
+        );
 
         Ok(())
     }
