@@ -1,0 +1,86 @@
+type ApiError = record {
+  tag : opt text;
+  info : opt vec text;
+  method_name : opt text;
+  message : opt text;
+  timestamp : nat64;
+  error_type : ApiErrorType;
+};
+type ApiErrorType = variant {
+  Duplicate;
+  SerializeError;
+  DeserializeError;
+  NotFound;
+  ValidationError : vec ValidationResponse;
+  Unsupported;
+  Unauthorized;
+  Unexpected;
+  NotImplemented;
+  BadRequest;
+};
+type Boost = record {
+  updated_at : nat64;
+  subject : Subject;
+  owner : principal;
+  seconds : nat64;
+  created_at : nat64;
+  blockheight : nat64;
+  notification_id : opt nat64;
+};
+type BoostedFilter = variant {
+  Ids : vec nat64;
+  UpdatedAt : DateRange;
+  None;
+  Owner : principal;
+  CreatedAt : DateRange;
+};
+type BoostedSort = variant {
+  UpdatedAt : SortDirection;
+  CreatedAt : SortDirection;
+};
+type DateRange = record { end_date : nat64; start_date : nat64 };
+type PagedResponse = record {
+  total : nat64;
+  data : vec record { nat64; Boost };
+  page : nat64;
+  limit : nat64;
+  number_of_pages : nat64;
+};
+type Result = variant { Ok : vec record { nat64; Boost }; Err : ApiError };
+type Result_1 = variant { Ok : PagedResponse; Err : ApiError };
+type Result_2 = variant { Ok : opt record { nat64; Boost }; Err : ApiError };
+type Result_3 = variant { Ok : record { nat64; Boost }; Err : ApiError };
+type Result_4 = variant { Ok : bool; Err : ApiError };
+type Result_5 = variant { Ok; Err : ApiError };
+type Result_6 = variant { Ok : nat64; Err : ApiError };
+type SortDirection = variant { Asc; Desc };
+type Subject = variant {
+  Event : nat64;
+  Group : nat64;
+  Attendee : principal;
+  None;
+  Member : principal;
+  Profile : principal;
+};
+type ValidationResponse = record { field : text; message : text };
+service : (vec principal) -> {
+  __get_candid_interface_tmp_hack : () -> (text) query;
+  filter : (vec BoostedFilter) -> (Result) query;
+  filter_paginated : (nat64, nat64, BoostedSort, vec BoostedFilter) -> (
+      Result_1,
+    ) query;
+  find : (vec BoostedFilter) -> (Result_2) query;
+  get : (nat64) -> (Result_3) query;
+  get_all : () -> (Result) query;
+  get_many : (vec nat64) -> (Result) query;
+  get_paginated : (nat64, nat64, BoostedSort) -> (Result_1) query;
+  icts_name : () -> (text) query;
+  icts_version : () -> (text) query;
+  insert : (Boost) -> (Result_3);
+  insert_by_key : (nat64, Boost) -> (Result_3);
+  remove : (nat64) -> (Result_4);
+  remove_many : (vec nat64) -> (Result_5);
+  size : () -> (Result_6) query;
+  update : (nat64, Boost) -> (Result_3);
+  update_many : (vec record { nat64; Boost }) -> (Result);
+}

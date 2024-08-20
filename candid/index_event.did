@@ -48,7 +48,7 @@ type Event = record {
   created_by : principal;
   created_on : nat64;
   website : text;
-  privacy : Privacy;
+  privacy : PrivacyType;
   group_id : nat64;
   is_canceled : record { bool; text };
   image : Asset;
@@ -108,7 +108,7 @@ type PhysicalLocation = record {
   address : Address;
   lattitude : float32;
 };
-type Privacy = variant { Gated : GatedType; Private; Public; InviteOnly };
+type PrivacyType = variant { Gated : GatedType; Private; Public; InviteOnly };
 type Result = variant { Ok : vec Shard; Err : ApiError };
 type Result_1 = variant { Ok : vec record { nat64; Event }; Err : ApiError };
 type Result_2 = variant { Ok : PagedResponse; Err : ApiError };

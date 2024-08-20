@@ -46,12 +46,6 @@ type GroupFilter = variant {
   Owner : principal;
   CreatedOn : DateRange;
 };
-type GroupSort = variant {
-  UpdatedOn : SortDirection;
-  MemberCount : SortDirection;
-  Name : SortDirection;
-  CreatedOn : SortDirection;
-};
 type GroupWithMembers = record {
   updated_on : nat64;
   references : References;
@@ -109,13 +103,6 @@ type NeuronGatedRules = variant {
   MinAge : nat64;
   MinDissolveDelay : nat64;
 };
-type PagedResponse = record {
-  total : nat64;
-  data : vec record { nat64; GroupWithMembers };
-  page : nat64;
-  limit : nat64;
-  number_of_pages : nat64;
-};
 type Permission = record {
   name : text;
   actions : PermissionActions;
@@ -138,23 +125,21 @@ type Privacy = record {
 };
 type PrivacyType = variant { Gated : GatedType; Private; Public; InviteOnly };
 type References = record { tags : vec nat32; notification_id : opt nat64 };
-type Result = variant { Ok : vec Shard; Err : ApiError };
-type Result_1 = variant {
+type Result = variant {
   Ok : vec record { nat64; GroupWithMembers };
   Err : ApiError;
 };
-type Result_2 = variant { Ok : PagedResponse; Err : ApiError };
-type Result_3 = variant {
+type Result_1 = variant {
   Ok : opt record { nat64; GroupWithMembers };
   Err : ApiError;
 };
-type Result_4 = variant {
+type Result_2 = variant {
   Ok : record { nat64; GroupWithMembers };
   Err : ApiError;
 };
-type Result_5 = variant { Ok : bool; Err : ApiError };
-type Result_6 = variant { Ok; Err : ApiError };
-type Result_7 = variant { Ok : nat64; Err : ApiError };
+type Result_3 = variant { Ok : bool; Err : ApiError };
+type Result_4 = variant { Ok; Err : ApiError };
+type Result_5 = variant { Ok : nat64; Err : ApiError };
 type Role = record {
   permissions : vec Permission;
   name : text;
@@ -162,8 +147,6 @@ type Role = record {
   protected : bool;
   index : opt nat64;
 };
-type Shard = record { id : principal; filled : bool };
-type SortDirection = variant { Asc; Desc };
 type TokenGated = record {
   "principal" : principal;
   name : text;
@@ -172,27 +155,19 @@ type TokenGated = record {
   standard : text;
 };
 type ValidationResponse = record { field : text; message : text };
-service : (vec principal) -> {
+service : () -> {
   __get_candid_interface_tmp_hack : () -> (text) query;
-  _dev_extend_shards : (nat64) -> (Result);
-  _dev_set_shard_filled : (principal, bool) -> (Result);
-  _dev_upload_wasm : (blob) -> (bool);
-  filter : (vec GroupFilter) -> (Result_1) composite_query;
-  filter_paginated : (nat64, nat64, GroupSort, vec GroupFilter) -> (
-      Result_2,
-    ) composite_query;
-  find : (vec GroupFilter) -> (Result_3) composite_query;
-  get : (nat64) -> (Result_4) composite_query;
-  get_all : () -> (Result_1) composite_query;
-  get_many : (vec nat64) -> (Result_1) composite_query;
-  get_paginated : (nat64, nat64, GroupSort) -> (Result_2) composite_query;
+  filter : (vec GroupFilter) -> (Result) query;
+  find : (vec GroupFilter) -> (Result_1) query;
+  get : (nat64) -> (Result_2) query;
+  get_all : () -> (Result) query;
+  get_many : (vec nat64) -> (Result) query;
   icts_name : () -> (text) query;
   icts_version : () -> (text) query;
-  insert : (GroupWithMembers) -> (Result_4);
-  insert_by_key : (nat64, GroupWithMembers) -> (Result_4);
-  remove : (nat64) -> (Result_5);
-  remove_many : (vec nat64) -> (Result_6);
-  size : () -> (Result_7) composite_query;
-  update : (nat64, GroupWithMembers) -> (Result_4);
-  update_many : (vec record { nat64; GroupWithMembers }) -> (Result_1);
+  insert : (nat64, GroupWithMembers) -> (Result_2);
+  remove : (nat64) -> (Result_3);
+  remove_many : (vec nat64) -> (Result_4);
+  size : () -> (Result_5) query;
+  update : (nat64, GroupWithMembers) -> (Result_2);
+  update_many : (vec record { nat64; GroupWithMembers }) -> (Result);
 }
