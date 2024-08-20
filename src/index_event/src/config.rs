@@ -1,6 +1,9 @@
 use candid::Principal;
 use catalyze_shared::StaticStorageRef;
-use common::{IndexConfig, IndexConfigWithKeyIter, Principals, ShardsIndex, StaticCellStorageRef};
+use common::{
+    IndexConfig, IndexConfigBase, IndexConfigWithKeyIter, Principals, ShardsIndex,
+    StaticCellStorageRef,
+};
 
 use crate::{aliases::Key, state::*};
 
@@ -27,11 +30,13 @@ impl Default for Config {
     }
 }
 
-impl IndexConfig<Key> for Config {
+impl IndexConfigBase<Key> for Config {
     fn storage_proxies(&self) -> StaticCellStorageRef<Principals> {
         self.proxies
     }
+}
 
+impl IndexConfig<Key> for Config {
     fn storage_shards(&self) -> StaticCellStorageRef<ShardsIndex> {
         self.shards
     }

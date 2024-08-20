@@ -14,3 +14,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Event index and shard implementations
 - Report index and shard implementations
 - Pagination support
+- Boosted index implementation
