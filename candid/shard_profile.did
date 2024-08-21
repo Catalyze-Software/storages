@@ -41,37 +41,30 @@ type DocumentDetails = record {
   approved_date : nat64;
   approved_version : nat64;
 };
+type GatedType = variant { Neuron : vec NeuronGated; Token : vec TokenGated };
 type Manifest = record { entries : vec ChunkData };
-type Profile = record {
-  updated_on : nat64;
-  profile_image : Asset;
-  banner_image : Asset;
-  about : text;
-  country : text;
-  username : text;
-  starred : vec Subject;
-  interests : vec nat32;
-  city : text;
-  created_on : nat64;
-  email : text;
-  website : text;
+type NeuronGated = record {
+  governance_canister : principal;
+  name : text;
+  description : text;
+  ledger_canister : principal;
+  rules : vec NeuronGatedRules;
+};
+type NeuronGatedRules = variant {
+  IsDisolving : bool;
+  MinStake : nat64;
+  MinAge : nat64;
+  MinDissolveDelay : nat64;
+};
+type Privacy = record {
+  privacy_type : PrivacyType;
+  privacy_gated_type_amount : opt nat64;
+};
+type PrivacyType = variant { Gated : GatedType; Private; Public; InviteOnly };
+type ProfileDocuments = record {
   terms_of_service : opt DocumentDetails;
-  display_name : text;
-  extra : text;
   privacy_policy : opt DocumentDetails;
-  notification_id : opt nat64;
-  pinned : vec Subject;
-  privacy : ProfilePrivacy;
-  wallets : vec record { principal; Wallet };
-  state_or_province : text;
-  first_name : text;
-  last_name : text;
-  causes : vec nat32;
   code_of_conduct : opt DocumentDetails;
-  date_of_birth : nat64;
-  skills : vec nat32;
-  relations : vec record { principal; text };
-  application_role : ApplicationRole;
 };
 type ProfileFilter = variant {
   Interest : nat32;
@@ -88,16 +81,55 @@ type ProfileFilter = variant {
   CreatedOn : DateRange;
   Username : text;
 };
-type ProfilePrivacy = variant { Private; Public };
+type ProfileMetadata = record {
+  profile_image : Asset;
+  banner_image : Asset;
+  about : text;
+  country : text;
+  username : text;
+  city : text;
+  email : text;
+  website : text;
+  display_name : text;
+  state_or_province : text;
+  first_name : text;
+  last_name : text;
+  date_of_birth : nat64;
+};
+type ProfileReferences = record {
+  groups : vec nat64;
+  starred : vec Subject;
+  interests : vec nat32;
+  pinned : vec Subject;
+  wallets : vec record { text; Wallet };
+  events : vec nat64;
+  causes : vec nat32;
+  skills : vec nat32;
+  relations : vec record { principal; text };
+};
+type ProfileWithRefs = record {
+  updated_on : nat64;
+  references : ProfileReferences;
+  documents : ProfileDocuments;
+  metadata : ProfileMetadata;
+  created_on : nat64;
+  extra : opt text;
+  notification_id : opt nat64;
+  privacy : Privacy;
+  application_role : ApplicationRole;
+};
 type Result = variant {
-  Ok : vec record { principal; Profile };
+  Ok : vec record { principal; ProfileWithRefs };
   Err : ApiError;
 };
 type Result_1 = variant {
-  Ok : opt record { principal; Profile };
+  Ok : opt record { principal; ProfileWithRefs };
   Err : ApiError;
 };
-type Result_2 = variant { Ok : record { principal; Profile }; Err : ApiError };
+type Result_2 = variant {
+  Ok : record { principal; ProfileWithRefs };
+  Err : ApiError;
+};
 type Result_3 = variant { Ok : bool; Err : ApiError };
 type Result_4 = variant { Ok; Err : ApiError };
 type Result_5 = variant { Ok : nat64; Err : ApiError };
@@ -108,6 +140,13 @@ type Subject = variant {
   None;
   Member : principal;
   Profile : principal;
+};
+type TokenGated = record {
+  "principal" : principal;
+  name : text;
+  description : text;
+  amount : nat64;
+  standard : text;
 };
 type ValidationResponse = record { field : text; message : text };
 type Wallet = record { provider : text; is_primary : bool };
@@ -120,10 +159,10 @@ service : () -> {
   get_many : (vec principal) -> (Result) query;
   icts_name : () -> (text) query;
   icts_version : () -> (text) query;
-  insert : (principal, Profile) -> (Result_2);
+  insert : (principal, ProfileWithRefs) -> (Result_2);
   remove : (principal) -> (Result_3);
   remove_many : (vec principal) -> (Result_4);
   size : () -> (Result_5) query;
-  update : (principal, Profile) -> (Result_2);
-  update_many : (vec record { principal; Profile }) -> (Result);
+  update : (principal, ProfileWithRefs) -> (Result_2);
+  update_many : (vec record { principal; ProfileWithRefs }) -> (Result);
 }

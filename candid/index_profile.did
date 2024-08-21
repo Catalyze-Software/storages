@@ -41,44 +41,37 @@ type DocumentDetails = record {
   approved_date : nat64;
   approved_version : nat64;
 };
+type GatedType = variant { Neuron : vec NeuronGated; Token : vec TokenGated };
 type Manifest = record { entries : vec ChunkData };
+type NeuronGated = record {
+  governance_canister : principal;
+  name : text;
+  description : text;
+  ledger_canister : principal;
+  rules : vec NeuronGatedRules;
+};
+type NeuronGatedRules = variant {
+  IsDisolving : bool;
+  MinStake : nat64;
+  MinAge : nat64;
+  MinDissolveDelay : nat64;
+};
 type PagedResponse = record {
   total : nat64;
-  data : vec record { principal; Profile };
+  data : vec record { principal; ProfileWithRefs };
   page : nat64;
   limit : nat64;
   number_of_pages : nat64;
 };
-type Profile = record {
-  updated_on : nat64;
-  profile_image : Asset;
-  banner_image : Asset;
-  about : text;
-  country : text;
-  username : text;
-  starred : vec Subject;
-  interests : vec nat32;
-  city : text;
-  created_on : nat64;
-  email : text;
-  website : text;
+type Privacy = record {
+  privacy_type : PrivacyType;
+  privacy_gated_type_amount : opt nat64;
+};
+type PrivacyType = variant { Gated : GatedType; Private; Public; InviteOnly };
+type ProfileDocuments = record {
   terms_of_service : opt DocumentDetails;
-  display_name : text;
-  extra : text;
   privacy_policy : opt DocumentDetails;
-  notification_id : opt nat64;
-  pinned : vec Subject;
-  privacy : ProfilePrivacy;
-  wallets : vec record { principal; Wallet };
-  state_or_province : text;
-  first_name : text;
-  last_name : text;
-  causes : vec nat32;
   code_of_conduct : opt DocumentDetails;
-  date_of_birth : nat64;
-  skills : vec nat32;
-  relations : vec record { principal; text };
-  application_role : ApplicationRole;
 };
 type ProfileFilter = variant {
   Interest : nat32;
@@ -95,22 +88,61 @@ type ProfileFilter = variant {
   CreatedOn : DateRange;
   Username : text;
 };
-type ProfilePrivacy = variant { Private; Public };
+type ProfileMetadata = record {
+  profile_image : Asset;
+  banner_image : Asset;
+  about : text;
+  country : text;
+  username : text;
+  city : text;
+  email : text;
+  website : text;
+  display_name : text;
+  state_or_province : text;
+  first_name : text;
+  last_name : text;
+  date_of_birth : nat64;
+};
+type ProfileReferences = record {
+  groups : vec nat64;
+  starred : vec Subject;
+  interests : vec nat32;
+  pinned : vec Subject;
+  wallets : vec record { text; Wallet };
+  events : vec nat64;
+  causes : vec nat32;
+  skills : vec nat32;
+  relations : vec record { principal; text };
+};
 type ProfileSort = variant {
   UpdatedOn : SortDirection;
   CreatedOn : SortDirection;
 };
+type ProfileWithRefs = record {
+  updated_on : nat64;
+  references : ProfileReferences;
+  documents : ProfileDocuments;
+  metadata : ProfileMetadata;
+  created_on : nat64;
+  extra : opt text;
+  notification_id : opt nat64;
+  privacy : Privacy;
+  application_role : ApplicationRole;
+};
 type Result = variant { Ok : vec Shard; Err : ApiError };
 type Result_1 = variant {
-  Ok : vec record { principal; Profile };
+  Ok : vec record { principal; ProfileWithRefs };
   Err : ApiError;
 };
 type Result_2 = variant { Ok : PagedResponse; Err : ApiError };
 type Result_3 = variant {
-  Ok : opt record { principal; Profile };
+  Ok : opt record { principal; ProfileWithRefs };
   Err : ApiError;
 };
-type Result_4 = variant { Ok : record { principal; Profile }; Err : ApiError };
+type Result_4 = variant {
+  Ok : record { principal; ProfileWithRefs };
+  Err : ApiError;
+};
 type Result_5 = variant { Ok : bool; Err : ApiError };
 type Result_6 = variant { Ok; Err : ApiError };
 type Result_7 = variant { Ok : nat64; Err : ApiError };
@@ -124,11 +156,19 @@ type Subject = variant {
   Member : principal;
   Profile : principal;
 };
+type TokenGated = record {
+  "principal" : principal;
+  name : text;
+  description : text;
+  amount : nat64;
+  standard : text;
+};
 type ValidationResponse = record { field : text; message : text };
 type Wallet = record { provider : text; is_primary : bool };
 service : (vec principal) -> {
   __get_candid_interface_tmp_hack : () -> (text) query;
   _dev_extend_shards : (nat64) -> (Result);
+  _dev_get_shards : () -> (Result) query;
   _dev_set_shard_filled : (principal, bool) -> (Result);
   _dev_upload_wasm : (blob) -> (bool);
   filter : (vec ProfileFilter) -> (Result_1) composite_query;
@@ -142,10 +182,10 @@ service : (vec principal) -> {
   get_paginated : (nat64, nat64, ProfileSort) -> (Result_2) composite_query;
   icts_name : () -> (text) query;
   icts_version : () -> (text) query;
-  insert : (principal, Profile) -> (Result_4);
+  insert : (principal, ProfileWithRefs) -> (Result_4);
   remove : (principal) -> (Result_5);
   remove_many : (vec principal) -> (Result_6);
   size : () -> (Result_7) composite_query;
-  update : (principal, Profile) -> (Result_4);
-  update_many : (vec record { principal; Profile }) -> (Result_1);
+  update : (principal, ProfileWithRefs) -> (Result_4);
+  update_many : (vec record { principal; ProfileWithRefs }) -> (Result_1);
 }
