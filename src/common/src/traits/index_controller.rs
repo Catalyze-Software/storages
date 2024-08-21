@@ -3,11 +3,11 @@ use std::{collections::HashMap, fmt::Display};
 use async_trait::async_trait;
 use candid::Principal;
 use catalyze_shared::{
-    api_error::ApiError, paged_response::PagedResponse, CanisterResult, Filter, Sorter,
+    api_error::ApiError, paged_response::PagedResponse, CanisterResult, CellStorage, Filter, Sorter,
 };
 use ic_stable_structures::Storable;
 
-use crate::{CellStorage, IndexConfig, Registry, ShardClient};
+use crate::{IndexConfig, Registry, ShardClient};
 
 #[async_trait]
 pub trait IndexController<K, V, F, S>: Send + Sync

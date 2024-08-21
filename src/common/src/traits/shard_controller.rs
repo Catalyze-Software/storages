@@ -1,10 +1,12 @@
+use std::fmt::Display;
+
 use candid::Principal;
-use catalyze_shared::{CanisterResult, Filter, StaticStorageRef};
+use catalyze_shared::{
+    CanisterResult, CellStorage, Filter, GenericCellStorage, StaticCellStorageRef, StaticStorageRef,
+};
 use ic_stable_structures::Storable;
 
 use crate::ShardStorage;
-
-use super::{CellStorage, StaticCellStorageRef};
 
 pub trait ShardController<K, V, F>
 where
@@ -23,7 +25,7 @@ where
     }
 
     fn index(&self) -> impl CellStorage<Principal> {
-        Index::new(self.storage_index())
+        GenericCellStorage::new("index", self.storage_index())
     }
 
     fn size(&self) -> CanisterResult<u64> {
@@ -76,31 +78,7 @@ where
     }
 }
 
-struct Index {
-    name: String,
-    storage: StaticCellStorageRef<Principal>,
-}
-
-impl Index {
-    pub fn new(storage: StaticCellStorageRef<Principal>) -> Self {
-        Self {
-            name: "index".to_owned(),
-            storage,
-        }
-    }
-}
-
-impl CellStorage<Principal> for Index {
-    fn name(&self) -> String {
-        self.name.clone()
-    }
-
-    fn storage(&self) -> StaticCellStorageRef<Principal> {
-        self.storage
-    }
-}
-
-pub(crate) struct Storage<K, V>
+pub struct Storage<K, V>
 where
     K: candid::CandidType + 'static + Storable + Ord + Clone + Send + Sync,
     V: candid::CandidType + 'static + Storable + Clone + Send + Sync,
@@ -114,8 +92,11 @@ where
     K: candid::CandidType + 'static + Storable + Ord + Clone + Send + Sync,
     V: candid::CandidType + 'static + Storable + Clone + Send + Sync,
 {
-    pub fn new(name: String, raw: StaticStorageRef<K, V>) -> Self {
-        Self { name, raw }
+    pub fn new<S: Display>(name: S, raw: StaticStorageRef<K, V>) -> Self {
+        Self {
+            name: name.to_string(),
+            raw,
+        }
     }
 }
 

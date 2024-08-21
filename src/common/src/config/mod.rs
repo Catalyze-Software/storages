@@ -1,22 +1,14 @@
 use std::fmt::Display;
 
 use candid::Principal;
-use catalyze_shared::StaticStorageRef;
+use catalyze_shared::{CellStorage, GenericCellStorage, StaticCellStorageRef, StaticStorageRef};
 use ic_stable_structures::Storable;
 use key_iter::KeyIter;
-use proxies::Proxies;
-use shard_iter::ShardIter;
-use shard_wasm::ShardWasm;
-use shards::Shards;
 
-use crate::{CellStorage, IDIter, Principals, ShardsIndex, StaticCellStorageRef};
+use crate::{IDIter, Principals, ShardsIndex};
 
 mod key_iter;
-mod proxies;
 mod registry;
-mod shard_iter;
-mod shard_wasm;
-mod shards;
 
 pub trait IndexConfigBase<K>: Send + Sync
 where
@@ -36,7 +28,7 @@ where
 
     // public API
     fn proxies(&self) -> impl CellStorage<Principals> {
-        Proxies::new(self.storage_proxies())
+        GenericCellStorage::new("proxies", self.storage_proxies())
     }
 }
 
@@ -62,15 +54,15 @@ where
 
     // public API
     fn shards(&self) -> impl CellStorage<ShardsIndex> {
-        Shards::new(self.storage_shards())
+        GenericCellStorage::new("shards", self.storage_shards())
     }
 
     fn shard_iter(&self) -> impl CellStorage<Principal> {
-        ShardIter::new(self.storage_shard_iter())
+        GenericCellStorage::new("shard_iter", self.storage_shard_iter())
     }
 
     fn shard_wasm(&self) -> impl CellStorage<Vec<u8>> {
-        ShardWasm::new(self.storage_shard_wasm())
+        GenericCellStorage::new("shard_wasm", self.storage_shard_wasm())
     }
 
     fn registry(&self) -> impl crate::Registry<K> {

@@ -1,5 +1,5 @@
-use catalyze_shared::CanisterResult;
-use common::{is_developer, is_storage_index, CellStorage, ShardController};
+use catalyze_shared::{CanisterResult, CellStorage};
+use common::{is_developer, is_storage_index, ShardController};
 use ic_cdk::{query, update};
 
 use crate::{

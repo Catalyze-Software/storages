@@ -1,4 +1,6 @@
-use crate::{CellStorage, IDIter, StaticCellStorageRef};
+use catalyze_shared::{CellStorage, StaticCellStorageRef};
+
+use crate::IDIter;
 
 pub struct KeyIter {
     name: String,
