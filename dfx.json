@@ -111,6 +111,34 @@
           "name": "candid:service"
         }
       ]
+    },
+    "index_notification": {
+      "type": "custom",
+      "package": "index_notification",
+      "candid": "candid/index_notification.did",
+      "wasm": "wasm/index_notification.wasm.gz",
+      "build": [
+        "bash scripts/build.sh"
+      ],
+      "metadata": [
+        {
+          "name": "candid:service"
+        }
+      ]
+    },
+    "shard_notification": {
+      "type": "custom",
+      "package": "shard_notification",
+      "candid": "candid/shard_notification.did",
+      "wasm": "wasm/shard_notification.wasm.gz",
+      "build": [
+        "bash scripts/build.sh"
+      ],
+      "metadata": [
+        {
+          "name": "candid:service"
+        }
+      ]
     }
   },
   "networks": {
