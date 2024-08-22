@@ -60,6 +60,10 @@ where
         self.storage().insert_by_key(key, value)
     }
 
+    fn insert_many(&self, list: Vec<(K, V)>) -> CanisterResult<Vec<(K, V)>> {
+        self.storage().insert_by_key_many(list)
+    }
+
     fn update(&self, key: K, value: V) -> CanisterResult<(K, V)> {
         self.storage().update(key, value)
     }

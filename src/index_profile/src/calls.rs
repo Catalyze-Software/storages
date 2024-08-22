@@ -136,6 +136,11 @@ async fn insert(key: Key, value: Value) -> CanisterResult<Entry> {
 }
 
 #[update(guard = "is_proxy_guard")]
+async fn insert_many(list: Vec<Entry>) -> CanisterResult<Vec<Entry>> {
+    controller().insert_many(list).await
+}
+
+#[update(guard = "is_proxy_guard")]
 async fn update(key: Key, value: Value) -> CanisterResult<Entry> {
     controller().update(key, value).await
 }

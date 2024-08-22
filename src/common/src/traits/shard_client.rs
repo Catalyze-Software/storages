@@ -62,6 +62,14 @@ where
         ic_call(shard, "insert", (key, value))
     }
 
+    fn insert_many(
+        &self,
+        shard: Principal,
+        list: Vec<(K, V)>,
+    ) -> impl std::future::Future<Output = CanisterResult<Vec<(K, V)>>> + Sync + Send {
+        ic_call(shard, "insert_many", (list,))
+    }
+
     fn update(
         &self,
         shard: Principal,

@@ -86,6 +86,17 @@ fn insert(value: Value) -> CanisterResult<Entry> {
     controller().insert(config().key_iter().next()?, value)
 }
 
+#[update(guard = "is_proxy_guard")]
+fn insert_many(list: Vec<Value>) -> CanisterResult<Vec<Entry>> {
+    let list = list.into_iter().try_fold(vec![], |mut acc, value| {
+        let key = config().key_iter().next()?;
+        acc.push((key, value));
+        Ok(acc)
+    })?;
+
+    controller().insert_many(list)
+}
+
 #[update(guard = "is_migration")]
 fn insert_by_key(key: Key, value: Value) -> CanisterResult<Entry> {
     controller::insert_by_key_stateful(controller(), config().key_iter(), key, value)
