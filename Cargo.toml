@@ -14,7 +14,7 @@ ic-ledger-types = "0.12"
 async-trait = "0.1"
 futures = "0.3"
 
-catalyze-shared = { git = "https://github.com/Catalyze-Software/catalyze-shared" }
+catalyze-shared = { git = "https://github.com/Catalyze-Software/catalyze-shared", branch = "feat/topics" }
 
 [profile.release]
 lto = true

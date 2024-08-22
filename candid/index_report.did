@@ -71,6 +71,7 @@ type ValidationResponse = record { field : text; message : text };
 service : (vec principal) -> {
   __get_candid_interface_tmp_hack : () -> (text) query;
   _dev_extend_shards : (nat64) -> (Result);
+  _dev_get_shards : () -> (Result) query;
   _dev_set_shard_filled : (principal, bool) -> (Result);
   _dev_upload_wasm : (blob) -> (bool);
   filter : (vec ReportFilter) -> (Result_1) composite_query;
