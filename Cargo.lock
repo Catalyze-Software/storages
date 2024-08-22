@@ -261,7 +261,7 @@ dependencies = [
 [[package]]
 name = "catalyze-shared"
 version = "0.1.0"
-source = "git+https://github.com/Catalyze-Software/catalyze-shared?branch=feat/friend-reqs#6c0e5ec9f700531772fed39693d17300fc18ab6e"
+source = "git+https://github.com/Catalyze-Software/catalyze-shared?branch=feat/friend-reqs#f0d2e7a9edd298a0aecf1a5b7a7408cfc86939f4"
 dependencies = [
  "candid",
  "email_address",
@@ -1035,6 +1035,19 @@ dependencies = [
 
 [[package]]
 name = "index_event"
+version = "0.1.0"
+dependencies = [
+ "candid",
+ "catalyze-shared",
+ "common",
+ "ic-cdk",
+ "ic-stable-structures",
+ "serde",
+ "serde_bytes",
+]
+
+[[package]]
+name = "index_friend_request"
 version = "0.1.0"
 dependencies = [
  "candid",
