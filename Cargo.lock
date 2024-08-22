@@ -261,7 +261,7 @@ dependencies = [
 [[package]]
 name = "catalyze-shared"
 version = "0.1.0"
-source = "git+https://github.com/Catalyze-Software/catalyze-shared#0fe28efa6b9a38483c7d6ff5ff3d9a7ce1a8073e"
+source = "git+https://github.com/Catalyze-Software/catalyze-shared#b89019ba7c093251c1a34ae44c0d766bf416289f"
 dependencies = [
  "candid",
  "email_address",
@@ -1090,6 +1090,19 @@ dependencies = [
 
 [[package]]
 name = "index_report"
+version = "0.1.0"
+dependencies = [
+ "candid",
+ "catalyze-shared",
+ "common",
+ "ic-cdk",
+ "ic-stable-structures",
+ "serde",
+ "serde_bytes",
+]
+
+[[package]]
+name = "index_topic"
 version = "0.1.0"
 dependencies = [
  "candid",

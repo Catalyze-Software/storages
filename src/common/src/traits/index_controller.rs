@@ -201,6 +201,31 @@ where
         self.client().insert(shard, key, value).await
     }
 
+    async fn insert_many(&self, list: Vec<(K, V)>) -> CanisterResult<Vec<(K, V)>> {
+        let list_map = list.clone().into_iter().collect::<HashMap<_, _>>();
+
+        let ids_map = list
+            .clone()
+            .into_iter()
+            .try_fold(HashMap::new(), |mut acc, (id, _)| {
+                let shard = self.next_shard()?;
+                let entry: &mut Vec<K> = acc.entry(shard).or_default();
+                entry.push(id);
+                Ok(acc)
+            })?;
+
+        for (shard, ids) in ids_map.into_iter() {
+            let list = ids
+                .into_iter()
+                .map(|id| (id.clone(), list_map.get(&id).unwrap().clone()))
+                .collect();
+
+            self.client().insert_many(shard, list).await?;
+        }
+
+        Ok(list)
+    }
+
     async fn update(&self, key: K, value: V) -> CanisterResult<(K, V)> {
         let shard = self.config().registry().shard_by_id(key.clone())?;
         self.client().update(shard, key, value).await

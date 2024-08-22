@@ -16,3 +16,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Pagination support
 - Boosted index implementation
 - Notification index and shard implementations
+- Topic index implementation

@@ -56,6 +56,11 @@ fn insert(key: Key, value: Value) -> CanisterResult<Entry> {
 }
 
 #[update(guard = "is_index_guard")]
+fn insert_many(list: Vec<Entry>) -> CanisterResult<Vec<Entry>> {
+    controller().insert_many(list)
+}
+
+#[update(guard = "is_index_guard")]
 fn update(key: Key, value: Value) -> CanisterResult<Entry> {
     controller().update(key, value)
 }
