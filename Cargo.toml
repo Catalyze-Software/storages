@@ -10,6 +10,7 @@ serde_bytes = "0.11"
 ic-cdk = "0.15"
 ic-stable-structures = "0.6"
 ic-ledger-types = "0.12"
+ic-cdk-timers = "0.9"
 
 async-trait = "0.1"
 futures = "0.3"
