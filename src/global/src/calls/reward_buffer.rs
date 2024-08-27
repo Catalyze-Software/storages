@@ -8,8 +8,8 @@ use ic_cdk::{query, update};
 use crate::{guards::is_proxy, logic::reward_buffer, timers::reward_timer};
 
 #[query(guard = "is_proxy")]
-fn read_reward_buffer() -> Vec<RewardableActivityResponse> {
-    reward_buffer::read()
+fn read_reward_buffer() -> CanisterResult<Vec<RewardableActivityResponse>> {
+    Ok(reward_buffer::read())
 }
 
 #[update(guard = "is_proxy")]

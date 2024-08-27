@@ -52,3 +52,7 @@ pub fn reward_timer() -> impl CellStorage<u64> {
 pub fn reward_canister() -> impl CellStorage<Principal> {
     GenericCellStorage::new("reward_canister_id", &REWARD_CANISTER)
 }
+
+pub fn group_canister() -> impl CellStorage<Principal> {
+    GenericCellStorage::new("group_canister_id", &GROUP_CANISTER)
+}
