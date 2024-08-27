@@ -3,6 +3,7 @@ use ic_cdk::query;
 
 use crate::{guards::is_proxy, state};
 
+mod canisters;
 mod history_point;
 mod reward_buffer;
 

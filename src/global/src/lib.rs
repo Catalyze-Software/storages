@@ -1,12 +1,16 @@
 use candid::Principal;
 use catalyze_shared::CellStorage;
 use common::queries;
-use ic_cdk::{init, query, trap};
+use ic_cdk::{init, post_upgrade, query, trap};
+use timers::reward_timer;
 
 mod calls;
+mod clients;
 mod guards;
 mod id;
+mod logic;
 mod state;
+mod timers;
 
 #[init]
 pub fn init(proxies: Vec<Principal>) {
@@ -17,6 +21,17 @@ pub fn init(proxies: Vec<Principal>) {
     state::proxies()
         .set(proxies.into())
         .expect("Failed to set proxies");
+
+    if let Err(e) = reward_timer::start() {
+        trap(&format!("Failed to start reward timer: {e}"));
+    }
+}
+
+#[post_upgrade]
+pub async fn post_upgrade() {
+    if let Err(e) = reward_timer::start() {
+        trap(&format!("Failed to start reward timer: {e}"));
+    }
 }
 
 #[query]
