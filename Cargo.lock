@@ -1059,6 +1059,7 @@ dependencies = [
  "catalyze-shared",
  "common",
  "ic-cdk",
+ "ic-cdk-timers",
  "ic-stable-structures",
  "serde",
  "serde_bytes",
