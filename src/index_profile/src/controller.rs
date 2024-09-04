@@ -38,7 +38,7 @@ impl Controller {
             .clone()
             .into_iter()
             .filter(|(referral, _)| !current.is_referral_exists(*referral))
-            .for_each(|(referral, data)| self.remove_referral(key, referral, data));
+            .for_each(|(referral, data)| self.remove_referral_with_timer(key, referral, data));
 
         // Update existing timers if referrals was updated
         updated
@@ -55,7 +55,7 @@ impl Controller {
             })
             .for_each(|(referral, data)| {
                 self.remove_timer(referral);
-                self.remove_referral(key, referral, data);
+                self.remove_referral_with_timer(key, referral, data);
             });
 
         Ok((key, updated))
@@ -74,23 +74,33 @@ impl Controller {
             .references
             .referrals
             .into_iter()
-            .for_each(|(referral, data)| self.remove_referral(key, referral, data));
+            .for_each(|(referral, data)| self.remove_referral_with_timer(key, referral, data));
     }
 
-    fn remove_referral(&self, profile_id: Key, referral: Principal, data: Referral) {
+    fn remove_referral_with_timer(&self, profile_id: Key, referral: Principal, data: Referral) {
+        if data.created_at + REFERRAL_EXPIRATION < time() {
+            // Use spawn to keep sync interface
+            self.spawn_referral_remove(profile_id, referral);
+            return;
+        }
+
         let delay = Duration::from_nanos(time() - data.created_at + REFERRAL_EXPIRATION);
 
         let timer_id = set_timer(delay, move || {
-            ic_cdk::spawn(async move {
-                let (_, mut profile) = controller().get(profile_id).await.unwrap();
-                profile.remove_referral(referral);
-                let _ = controller().update(profile_id, profile).await;
-
-                controller().remove_timer(referral);
-            });
+            controller().spawn_referral_remove(profile_id, referral);
         });
 
         self.set_timer_id(referral, timer_id);
+    }
+
+    pub fn spawn_referral_remove(&self, profile_id: Key, referral: Principal) {
+        ic_cdk::spawn(async move {
+            let (_, mut profile) = controller().get(profile_id).await.unwrap();
+            profile.remove_referral(referral);
+            let _ = controller().update(profile_id, profile).await;
+
+            controller().remove_timer(referral);
+        });
     }
 
     fn set_timer_id(&self, referral: Principal, timer_id: TimerId) {
