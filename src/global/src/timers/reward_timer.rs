@@ -1,5 +1,6 @@
 use std::time::Duration;
 
+use candid::Principal;
 use catalyze_shared::{
     api_error::ApiError,
     reward::{Activity, GroupReward, RewardDataPackage, UserActivity},
@@ -46,10 +47,14 @@ pub async fn send_reward_data() -> CanisterResult<()> {
     let reward_canister = reward_canister().get()?;
     let reward_data = process_buffer().await?;
 
-    let _ = call::<(Vec<GroupReward>, Vec<UserActivity>), ()>(
+    let _ = call::<(Vec<GroupReward>, Vec<UserActivity>, Vec<Principal>), ()>(
         reward_canister,
         "process_buffer",
-        (reward_data.group_member_counts, reward_data.user_activity),
+        (
+            reward_data.group_member_counts,
+            reward_data.user_activity,
+            reward_data.user_referrals,
+        ),
     )
     .await;
 
@@ -64,6 +69,7 @@ pub async fn process_buffer() -> CanisterResult<RewardDataPackage> {
 
     let mut user_activity = vec![];
     let mut group_ids = vec![];
+    let mut user_referrals = vec![];
 
     for (_, rewardable) in rewardables.iter() {
         match rewardable.get_activity() {
@@ -72,6 +78,9 @@ pub async fn process_buffer() -> CanisterResult<RewardDataPackage> {
             }
             Activity::UserActivity(principal) => {
                 user_activity.push(UserActivity::new(principal, rewardable.get_timestamp()));
+            }
+            Activity::UserReferral(referrer) => {
+                user_referrals.push(referrer);
             }
         }
     }
@@ -87,5 +96,6 @@ pub async fn process_buffer() -> CanisterResult<RewardDataPackage> {
     Ok(RewardDataPackage {
         group_member_counts,
         user_activity,
+        user_referrals,
     })
 }

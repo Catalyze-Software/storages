@@ -5,7 +5,7 @@ use catalyze_shared::{
 use common::{
     is_developer, is_proxy, spawn_shard, IndexConfig, IndexConfigBase, IndexController, ShardsIndex,
 };
-use ic_cdk::{init, query, trap, update};
+use ic_cdk::{init, post_upgrade, query, trap, update};
 use serde_bytes::ByteBuf;
 
 use crate::{
@@ -23,7 +23,7 @@ fn is_proxy_guard() -> Result<(), String> {
 }
 
 #[init]
-fn init(proxies: Vec<Principal>) {
+async fn init(proxies: Vec<Principal>) {
     if proxies.is_empty() {
         trap("Proxies cannot be empty");
     }
@@ -32,6 +32,13 @@ fn init(proxies: Vec<Principal>) {
         .proxies()
         .set(proxies.into())
         .expect("Failed to set proxies");
+
+    controller().init_timers().await;
+}
+
+#[post_upgrade]
+async fn post_upgrade() {
+    controller().init_timers().await;
 }
 
 #[query(guard = "is_proxy_guard")]
@@ -142,7 +149,7 @@ async fn insert_many(list: Vec<Entry>) -> CanisterResult<Vec<Entry>> {
 
 #[update(guard = "is_proxy_guard")]
 async fn update(key: Key, value: Value) -> CanisterResult<Entry> {
-    controller().update(key, value).await
+    controller().update_profile(key, value).await
 }
 
 #[update(guard = "is_proxy_guard")]
