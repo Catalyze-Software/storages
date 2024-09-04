@@ -5,7 +5,7 @@ use catalyze_shared::{
 use common::{
     is_developer, is_proxy, spawn_shard, IndexConfig, IndexConfigBase, IndexController, ShardsIndex,
 };
-use ic_cdk::{init, query, trap, update};
+use ic_cdk::{init, post_upgrade, query, trap, update};
 use serde_bytes::ByteBuf;
 
 use crate::{
@@ -33,6 +33,11 @@ async fn init(proxies: Vec<Principal>) {
         .set(proxies.into())
         .expect("Failed to set proxies");
 
+    controller().init_timers().await;
+}
+
+#[post_upgrade]
+async fn post_upgrade() {
     controller().init_timers().await;
 }
 
