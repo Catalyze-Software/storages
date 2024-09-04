@@ -1,9 +1,12 @@
+use std::{cell::RefCell, collections::HashMap};
+
 use candid::Principal;
 use catalyze_shared::{
     state::{init_btree, init_cell, init_memory_manager},
     CellStorageRef, MemoryManagerStorage, StorageRef,
 };
 use common::{Principals, ShardsIndex};
+use ic_cdk_timers::TimerId;
 use ic_stable_structures::memory_manager::MemoryId;
 
 use crate::aliases::Key;
@@ -21,4 +24,6 @@ thread_local! {
     pub static SHARD_ITER: CellStorageRef<Principal> = init_cell(&MEMORY_MANAGER, "shard_iter", SHARD_ITER_MEMORY_ID);
     pub static SHARD_WASM: CellStorageRef<Vec<u8>> = init_cell(&MEMORY_MANAGER, "shards_wasm", SHARD_WASM_MEMORY_ID);
     pub static REGISTRY: StorageRef<Key, Principal> = init_btree(&MEMORY_MANAGER, REGISTRY_MEMORY_ID);
+
+    pub static REFERRAL_TIMERS: RefCell<HashMap<Principal, TimerId>> = RefCell::new(HashMap::default());
 }
