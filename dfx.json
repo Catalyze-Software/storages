@@ -28,6 +28,20 @@
         }
       ]
     },
+    "index_friend_request": {
+      "type": "custom",
+      "package": "index_topic",
+      "candid": "candid/index_topic.did",
+      "wasm": "wasm/index_topic.wasm.gz",
+      "build": [
+        "bash scripts/build.sh"
+      ],
+      "metadata": [
+        {
+          "name": "candid:service"
+        }
+      ]
+    },
     "index_profile": {
       "type": "custom",
       "package": "index_profile",

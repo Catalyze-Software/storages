@@ -55,7 +55,8 @@ type Result_3 = variant { Ok : opt record { nat64; Report }; Err : ApiError };
 type Result_4 = variant { Ok : record { nat64; Report }; Err : ApiError };
 type Result_5 = variant { Ok : bool; Err : ApiError };
 type Result_6 = variant { Ok; Err : ApiError };
-type Result_7 = variant { Ok : nat64; Err : ApiError };
+type Result_7 = variant { Ok : vec principal; Err : ApiError };
+type Result_8 = variant { Ok : nat64; Err : ApiError };
 type Shard = record { id : principal; filled : bool };
 type SortDirection = variant { Asc; Desc };
 type Subject = variant {
@@ -90,7 +91,8 @@ service : (vec principal) -> {
   insert_many : (vec Report) -> (Result_1);
   remove : (nat64) -> (Result_5);
   remove_many : (vec nat64) -> (Result_6);
-  size : () -> (Result_7) composite_query;
+  set_proxies : (vec principal) -> (Result_7);
+  size : () -> (Result_8) composite_query;
   update : (nat64, Report) -> (Result_4);
   update_many : (vec record { nat64; Report }) -> (Result_1);
 }

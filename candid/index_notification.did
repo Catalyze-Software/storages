@@ -147,7 +147,8 @@ type Result_3 = variant {
 type Result_4 = variant { Ok : record { nat64; Notification }; Err : ApiError };
 type Result_5 = variant { Ok : bool; Err : ApiError };
 type Result_6 = variant { Ok; Err : ApiError };
-type Result_7 = variant { Ok : nat64; Err : ApiError };
+type Result_7 = variant { Ok : vec principal; Err : ApiError };
+type Result_8 = variant { Ok : nat64; Err : ApiError };
 type Shard = record { id : principal; filled : bool };
 type SortDirection = variant { Asc; Desc };
 type TransactionCompleteData = record {
@@ -198,7 +199,8 @@ service : (vec principal) -> {
   insert_by_key : (nat64, Notification) -> (Result_4);
   remove : (nat64) -> (Result_5);
   remove_many : (vec nat64) -> (Result_6);
-  size : () -> (Result_7) composite_query;
+  set_proxies : (vec principal) -> (Result_7);
+  size : () -> (Result_8) composite_query;
   update : (nat64, Notification) -> (Result_4);
   update_many : (vec record { nat64; Notification }) -> (Result_1);
 }

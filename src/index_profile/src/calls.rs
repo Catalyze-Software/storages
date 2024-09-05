@@ -1,9 +1,12 @@
+use std::time::Duration;
+
 use candid::Principal;
 use catalyze_shared::{
     api_error::ApiError, paged_response::PagedResponse, CanisterResult, CellStorage,
 };
 use common::{
-    is_developer, is_proxy, spawn_shard, IndexConfig, IndexConfigBase, IndexController, ShardsIndex,
+    is_developer, is_proxy, spawn_shard, IndexConfig, IndexConfigBase, IndexController, Principals,
+    ShardsIndex,
 };
 use ic_cdk::{init, post_upgrade, query, trap, update};
 use serde_bytes::ByteBuf;
@@ -23,22 +26,26 @@ fn is_proxy_guard() -> Result<(), String> {
 }
 
 #[init]
-async fn init(proxies: Vec<Principal>) {
+fn init(proxies: Vec<Principal>) {
     if proxies.is_empty() {
         trap("Proxies cannot be empty");
     }
 
-    config()
-        .proxies()
-        .set(proxies.into())
-        .expect("Failed to set proxies");
-
-    controller().init_timers().await;
+    set_proxies(proxies).expect("Failed to set proxies");
 }
 
 #[post_upgrade]
-async fn post_upgrade() {
-    controller().init_timers().await;
+fn post_upgrade() {
+    ic_cdk_timers::set_timer(Duration::from_secs(1), || {
+        ic_cdk::spawn(async {
+            controller().init_timers().await;
+        });
+    });
+}
+
+#[update(guard = "is_proxy_guard")]
+fn set_proxies(proxies: Vec<Principal>) -> CanisterResult<Principals> {
+    config().proxies().set(proxies.into())
 }
 
 #[query(guard = "is_proxy_guard")]

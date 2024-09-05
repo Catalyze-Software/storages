@@ -31,7 +31,8 @@ type Result_2 = variant { Ok : opt record { nat64; Topic }; Err : ApiError };
 type Result_3 = variant { Ok : record { nat64; Topic }; Err : ApiError };
 type Result_4 = variant { Ok : bool; Err : ApiError };
 type Result_5 = variant { Ok; Err : ApiError };
-type Result_6 = variant { Ok : nat64; Err : ApiError };
+type Result_6 = variant { Ok : vec principal; Err : ApiError };
+type Result_7 = variant { Ok : nat64; Err : ApiError };
 type SortDirection = variant { Asc; Desc };
 type Topic = record { value : text; kind : TopicKind };
 type TopicFilter = variant { Kind : TopicKind; Value : text };
@@ -56,7 +57,8 @@ service : (vec principal) -> {
   insert_many : (vec Topic) -> (Result);
   remove : (nat64) -> (Result_4);
   remove_many : (vec nat64) -> (Result_5);
-  size : () -> (Result_6) query;
+  set_proxies : (vec principal) -> (Result_6);
+  size : () -> (Result_7) query;
   update : (nat64, Topic) -> (Result_3);
   update_many : (vec record { nat64; Topic }) -> (Result);
 }

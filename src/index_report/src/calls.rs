@@ -4,7 +4,7 @@ use catalyze_shared::{
 };
 use common::{
     controller, is_developer, is_migration, is_proxy, spawn_shard, IDIter, IndexConfig,
-    IndexConfigBase, IndexConfigWithKeyIter, IndexController, ShardsIndex,
+    IndexConfigBase, IndexConfigWithKeyIter, IndexController, Principals, ShardsIndex,
 };
 use ic_cdk::{init, query, trap, update};
 use serde_bytes::ByteBuf;
@@ -29,10 +29,12 @@ fn init(proxies: Vec<Principal>) {
         trap("Proxies cannot be empty");
     }
 
-    config()
-        .proxies()
-        .set(proxies.into())
-        .expect("Failed to set proxies");
+    set_proxies(proxies).expect("Failed to set proxies");
+}
+
+#[update(guard = "is_proxy_guard")]
+fn set_proxies(proxies: Vec<Principal>) -> CanisterResult<Principals> {
+    config().proxies().set(proxies.into())
 }
 
 #[query(guard = "is_proxy_guard")]
