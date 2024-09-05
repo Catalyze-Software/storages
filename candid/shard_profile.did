@@ -97,9 +97,12 @@ type ProfileMetadata = record {
   date_of_birth : nat64;
 };
 type ProfileReferences = record {
+  referrer : opt principal;
   groups : vec nat64;
+  notifications : vec record { nat64; UserNotificationData };
   starred : vec Subject;
   interests : vec nat32;
+  referrals : vec record { principal; Referral };
   pinned : vec Subject;
   wallets : vec record { text; Wallet };
   events : vec nat64;
@@ -118,6 +121,7 @@ type ProfileWithRefs = record {
   privacy : Privacy;
   application_role : ApplicationRole;
 };
+type Referral = record { created_at : nat64 };
 type Result = variant {
   Ok : vec record { principal; ProfileWithRefs };
   Err : ApiError;
@@ -148,6 +152,7 @@ type TokenGated = record {
   amount : nat64;
   standard : text;
 };
+type UserNotificationData = record { is_read : bool; is_sender : bool };
 type ValidationResponse = record { field : text; message : text };
 type Wallet = record { provider : text; is_primary : bool };
 service : () -> {
@@ -160,6 +165,7 @@ service : () -> {
   icts_name : () -> (text) query;
   icts_version : () -> (text) query;
   insert : (principal, ProfileWithRefs) -> (Result_2);
+  insert_many : (vec record { principal; ProfileWithRefs }) -> (Result);
   remove : (principal) -> (Result_3);
   remove_many : (vec principal) -> (Result_4);
   size : () -> (Result_5) query;

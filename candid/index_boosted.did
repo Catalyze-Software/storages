@@ -81,6 +81,7 @@ service : (vec principal) -> {
   icts_version : () -> (text) query;
   insert : (Boost) -> (Result_3);
   insert_by_key : (nat64, Boost) -> (Result_3);
+  insert_many : (vec Boost) -> (Result);
   remove : (nat64) -> (Result_4);
   remove_many : (vec nat64) -> (Result_5);
   size : () -> (Result_6) query;

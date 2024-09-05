@@ -87,6 +87,7 @@ service : (vec principal) -> {
   icts_version : () -> (text) query;
   insert : (Report) -> (Result_4);
   insert_by_key : (nat64, Report) -> (Result_4);
+  insert_many : (vec Report) -> (Result_1);
   remove : (nat64) -> (Result_5);
   remove_many : (vec nat64) -> (Result_6);
   size : () -> (Result_7) composite_query;

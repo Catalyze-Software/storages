@@ -1,0 +1,204 @@
+type ApiError = record {
+  tag : opt text;
+  info : opt vec text;
+  method_name : opt text;
+  message : opt text;
+  timestamp : nat64;
+  error_type : ApiErrorType;
+};
+type ApiErrorType = variant {
+  Duplicate;
+  SerializeError;
+  DeserializeError;
+  NotFound;
+  ValidationError : vec ValidationResponse;
+  Unsupported;
+  Unauthorized;
+  Unexpected;
+  NotImplemented;
+  BadRequest;
+};
+type EventNotificationType = variant {
+  UserJoinEvent : record { nat64; nat64 };
+  JoinEventOwnerRequestDecline : InviteAttendeeResponse;
+  RemoveAttendeeByOwner : JoinedAttendeeResponse;
+  EventReminder : nat64;
+  JoinEventUserRequestAccept : InviteAttendeeResponse;
+  RoleAssignByOwner : JoinedAttendeeResponse;
+  JoinEventOwnerRequestAccept : InviteAttendeeResponse;
+  JoinEventOwnerRequest : InviteAttendeeResponse;
+  JoinEventUserRequest : InviteAttendeeResponse;
+  JoinEventUserRequestDecline : InviteAttendeeResponse;
+  UserLeaveEvent : record { nat64; nat64 };
+  RemoveInviteByOwner : InviteAttendeeResponse;
+};
+type FriendRequestResponse = record {
+  id : nat64;
+  to : principal;
+  created_at : nat64;
+  requested_by : principal;
+  message : text;
+};
+type GroupNotificationType = variant {
+  UserLeaveGroup : nat64;
+  UserJoinGroup : nat64;
+  JoinGroupUserRequest : InviteMemberResponse;
+  JoinGroupUserRequestDecline : InviteMemberResponse;
+  RoleAssignByOwner : JoinedMemberResponse;
+  JoinGroupOwnerRequest : InviteMemberResponse;
+  RemoveMemberByOwner : JoinedMemberResponse;
+  GroupReminder : nat64;
+  JoinGroupOwnerRequestDecline : InviteMemberResponse;
+  JoinGroupUserRequestAccept : InviteMemberResponse;
+  RemoveInviteByOwner : InviteMemberResponse;
+  JoinGroupOwnerRequestAccept : InviteMemberResponse;
+};
+type InviteAttendeeResponse = record {
+  "principal" : principal;
+  invite_type : InviteType;
+  group_id : nat64;
+  event_id : nat64;
+};
+type InviteMemberResponse = record {
+  "principal" : principal;
+  group_id : nat64;
+  invite : opt MemberInvite;
+};
+type InviteType = variant { OwnerRequest; UserRequest };
+type JoinedAttendeeResponse = record {
+  "principal" : principal;
+  group_id : nat64;
+  event_id : nat64;
+};
+type JoinedMemberResponse = record {
+  "principal" : principal;
+  group_id : nat64;
+  roles : vec text;
+};
+type MemberInvite = record {
+  updated_at : nat64;
+  invite_type : InviteType;
+  created_at : nat64;
+  notification_id : opt nat64;
+};
+type MetadataValue = variant { Int : int; Nat : nat; Blob : blob; Text : text };
+type MultisigNotificationType = variant {
+  ProposalDecline : record { principal; nat64; nat64 };
+  ProposalAccept : record { principal; nat64; nat64 };
+  WhitelistNotice : record { principal; nat64 };
+  ProposalStatusUpdate : record { principal; nat64; nat64 };
+  NewProposal : record { principal; nat64; nat64 };
+};
+type Notification = record {
+  updated_at : nat64;
+  metadata : opt text;
+  is_accepted : opt bool;
+  is_actionable : bool;
+  created_at : nat64;
+  sender : principal;
+  notification_type : NotificationType;
+  processed_by : opt principal;
+};
+type NotificationFilter = variant {
+  Ids : vec nat64;
+  None;
+  Type : NotificationType;
+  Actionable : bool;
+  ProcessedBy : principal;
+  Sender : principal;
+};
+type NotificationSort = variant {
+  UpdatedOn : SortDirection;
+  CreatedOn : SortDirection;
+};
+type NotificationType = variant {
+  Event : EventNotificationType;
+  Relation : RelationNotificationType;
+  Group : GroupNotificationType;
+  Transaction : TransactionNotificationType;
+  Multisig : MultisigNotificationType;
+};
+type PagedResponse = record {
+  total : nat64;
+  data : vec record { nat64; Notification };
+  page : nat64;
+  limit : nat64;
+  number_of_pages : nat64;
+};
+type RelationNotificationType = variant {
+  FriendRequest : FriendRequestResponse;
+  FriendRequestDecline : FriendRequestResponse;
+  FriendRemove : principal;
+  FriendRequestReminder : nat64;
+  BlockUser : principal;
+  FriendRequestRemove : nat64;
+  FriendRequestAccept : FriendRequestResponse;
+};
+type Result = variant { Ok : vec Shard; Err : ApiError };
+type Result_1 = variant {
+  Ok : vec record { nat64; Notification };
+  Err : ApiError;
+};
+type Result_2 = variant { Ok : PagedResponse; Err : ApiError };
+type Result_3 = variant {
+  Ok : opt record { nat64; Notification };
+  Err : ApiError;
+};
+type Result_4 = variant { Ok : record { nat64; Notification }; Err : ApiError };
+type Result_5 = variant { Ok : bool; Err : ApiError };
+type Result_6 = variant { Ok; Err : ApiError };
+type Result_7 = variant { Ok : nat64; Err : ApiError };
+type Shard = record { id : principal; filled : bool };
+type SortDirection = variant { Asc; Desc };
+type TransactionCompleteData = record {
+  metadata : vec record { text; MetadataValue };
+  sender : principal;
+  total_amount_distributed : nat;
+  canister : principal;
+  receiver_count : nat64;
+};
+type TransactionData = record {
+  fee : nat;
+  metadata : vec record { text; MetadataValue };
+  memo : opt blob;
+  sender : principal;
+  canister : principal;
+  amount : nat;
+  block_height : nat;
+  receiver : principal;
+};
+type TransactionNotificationType = variant {
+  SingleTransaction : TransactionData;
+  TransactionsComplete : TransactionCompleteData;
+};
+type ValidationResponse = record { field : text; message : text };
+service : (vec principal) -> {
+  __get_candid_interface_tmp_hack : () -> (text) query;
+  _dev_extend_shards : (nat64) -> (Result);
+  _dev_get_shards : () -> (Result) query;
+  _dev_set_shard_filled : (principal, bool) -> (Result);
+  _dev_upload_wasm : (blob) -> (bool);
+  filter : (vec NotificationFilter) -> (Result_1) composite_query;
+  filter_paginated : (
+      nat64,
+      nat64,
+      NotificationSort,
+      vec NotificationFilter,
+    ) -> (Result_2) composite_query;
+  find : (vec NotificationFilter) -> (Result_3) composite_query;
+  get : (nat64) -> (Result_4) composite_query;
+  get_all : () -> (Result_1) composite_query;
+  get_many : (vec nat64) -> (Result_1) composite_query;
+  get_paginated : (nat64, nat64, NotificationSort) -> (
+      Result_2,
+    ) composite_query;
+  icts_name : () -> (text) query;
+  icts_version : () -> (text) query;
+  insert : (Notification) -> (Result_4);
+  insert_by_key : (nat64, Notification) -> (Result_4);
+  remove : (nat64) -> (Result_5);
+  remove_many : (vec nat64) -> (Result_6);
+  size : () -> (Result_7) composite_query;
+  update : (nat64, Notification) -> (Result_4);
+  update_many : (vec record { nat64; Notification }) -> (Result_1);
+}
