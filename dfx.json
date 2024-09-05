@@ -1,5 +1,33 @@
 {
   "canisters": {
+    "index_boosted": {
+      "type": "custom",
+      "package": "index_boosted",
+      "candid": "candid/index_boosted.did",
+      "wasm": "wasm/index_boosted.wasm.gz",
+      "build": [
+        "bash scripts/build.sh"
+      ],
+      "metadata": [
+        {
+          "name": "candid:service"
+        }
+      ]
+    },
+    "index_topic": {
+      "type": "custom",
+      "package": "index_topic",
+      "candid": "candid/index_topic.did",
+      "wasm": "wasm/index_topic.wasm.gz",
+      "build": [
+        "bash scripts/build.sh"
+      ],
+      "metadata": [
+        {
+          "name": "candid:service"
+        }
+      ]
+    },
     "index_profile": {
       "type": "custom",
       "package": "index_profile",

@@ -1,4 +1,7 @@
 {
+  "index_boosted": {
+    "development": "vyeaw-2yaaa-aaaap-ahw2a-cai"
+  },
   "index_event": {
     "development": "i4fbf-wyaaa-aaaap-ahtbq-cai"
   },
@@ -13,5 +16,8 @@
   },
   "index_report": {
     "development": "iha5a-maaaa-aaaap-ahtda-cai"
+  },
+  "index_topic": {
+    "development": "v7fgc-xaaaa-aaaap-ahw2q-cai"
   }
 }
