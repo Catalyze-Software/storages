@@ -39,3 +39,9 @@ pub fn notify_referral_accepted(referrer: Principal) -> CanisterResult<()> {
     let activity = RewardableActivity::new(Activity::UserReferral(referrer));
     reward_buffer::insert(activity)
 }
+
+#[update(guard = "is_proxy")]
+pub fn notify_profile_filled(principal: Principal) -> CanisterResult<()> {
+    let activity = RewardableActivity::new(Activity::UserProfileFilled(principal));
+    reward_buffer::insert(activity)
+}
