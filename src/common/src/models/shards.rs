@@ -1,4 +1,4 @@
-use candid::{CandidType, Deserialize};
+use candid::{CandidType, Deserialize, Principal};
 use catalyze_shared::impl_storable_for;
 
 use crate::Shard;
@@ -19,6 +19,10 @@ impl ShardsIndex {
 
     pub fn append(&mut self, other: &mut Vec<Shard>) {
         self.0.append(other);
+    }
+
+    pub fn contains(&self, shard: Principal) -> bool {
+        self.0.iter().any(|s| s.id() == shard)
     }
 }
 

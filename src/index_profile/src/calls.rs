@@ -1,12 +1,9 @@
 use std::time::Duration;
 
 use candid::Principal;
-use catalyze_shared::{
-    api_error::ApiError, paged_response::PagedResponse, CanisterResult, CellStorage,
-};
+use catalyze_shared::{paged_response::PagedResponse, CanisterResult, CellStorage};
 use common::{
-    is_developer, is_proxy, spawn_shard, IndexConfig, IndexConfigBase, IndexController, Principals,
-    ShardsIndex,
+    is_developer, is_proxy, IndexConfig, IndexConfigBase, IndexController, Principals, ShardsIndex,
 };
 use ic_cdk::{init, post_upgrade, query, trap, update};
 use serde_bytes::ByteBuf;
@@ -55,20 +52,7 @@ fn _dev_get_shards() -> CanisterResult<ShardsIndex> {
 
 #[update(guard = "is_proxy_guard")]
 async fn _dev_extend_shards(shards: u64) -> CanisterResult<ShardsIndex> {
-    let shard_ids = config().shards().get().unwrap_or_default();
-    let shard_wasm = config().shard_wasm().get()?;
-    let mut new_shards_list = shard_ids.to_vec();
-
-    for _ in 0..shards {
-        new_shards_list.push(spawn_shard(shard_wasm.clone()).await?);
-    }
-    let shard_ids = config().shards().set(new_shards_list.clone().into())?;
-
-    if config().shard_iter().get().is_err() {
-        config().shard_iter().set(new_shards_list[0].id())?;
-    }
-
-    Ok(shard_ids)
+    controller().extend_shards(shards).await
 }
 
 #[update(guard = "is_proxy_guard")]
@@ -78,19 +62,12 @@ fn _dev_upload_wasm(wasm: ByteBuf) -> bool {
 
 #[update(guard = "is_proxy_guard")]
 fn _dev_set_shard_filled(shard: Principal, filled: bool) -> CanisterResult<ShardsIndex> {
-    let mut shard_ids = config().shards().get()?.to_vec();
+    controller().set_shard_filled(shard, filled)
+}
 
-    let idx = shard_ids
-        .iter()
-        .position(|s| s.id() == shard)
-        .ok_or_else(|| {
-            ApiError::not_found().add_message(format!("Shard with the id {shard} not found"))
-        })?;
-
-    let shard = shard_ids.get_mut(idx).expect("Shard not found");
-    shard.set_filled(filled);
-
-    config().shards().set(shard_ids.clone().into())
+#[update(guard = "is_proxy_guard")]
+async fn _dev_upgrade_shard(shard: Principal) -> CanisterResult<()> {
+    controller().upgrade_shard(shard).await
 }
 
 #[query(composite = true, guard = "is_proxy_guard")]
