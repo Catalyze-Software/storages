@@ -2,7 +2,7 @@ use candid::Principal;
 use catalyze_shared::{paged_response::PagedResponse, CanisterResult, CellStorage};
 use common::{
     controller, is_developer, is_migration, is_proxy, IDIter, IndexConfigBase,
-    IndexConfigWithKeyIter, IndexControllerStateful,
+    IndexConfigWithKeyIter, IndexControllerStateful, Principals,
 };
 use ic_cdk::{init, query, trap, update};
 
@@ -26,10 +26,12 @@ fn init(proxies: Vec<Principal>) {
         trap("Proxies cannot be empty");
     }
 
-    config()
-        .proxies()
-        .set(proxies.into())
-        .expect("Failed to set proxies");
+    set_proxies(proxies).expect("Failed to set proxies");
+}
+
+#[update(guard = "is_proxy_guard")]
+fn set_proxies(proxies: Vec<Principal>) -> CanisterResult<Principals> {
+    config().proxies().set(proxies.into())
 }
 
 #[query(guard = "is_proxy_guard")]

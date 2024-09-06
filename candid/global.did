@@ -1,0 +1,52 @@
+type Activity = variant {
+  UserActivity : principal;
+  UserReferral : principal;
+  GroupMemberCount : nat64;
+};
+type ApiError = record {
+  tag : opt text;
+  info : opt vec text;
+  method_name : opt text;
+  message : opt text;
+  timestamp : nat64;
+  error_type : ApiErrorType;
+};
+type ApiErrorType = variant {
+  Duplicate;
+  SerializeError;
+  DeserializeError;
+  NotFound;
+  ValidationError : vec ValidationResponse;
+  Unsupported;
+  Unauthorized;
+  Unexpected;
+  NotImplemented;
+  BadRequest;
+};
+type Result = variant { Ok : principal; Err : ApiError };
+type Result_1 = variant { Ok : nat64; Err : ApiError };
+type Result_2 = variant { Ok; Err : ApiError };
+type Result_3 = variant { Ok : vec RewardableActivityResponse; Err : ApiError };
+type RewardableActivityResponse = record {
+  timestamp : nat64;
+  activity : Activity;
+};
+type ValidationResponse = record { field : text; message : text };
+service : (vec principal) -> {
+  __get_candid_interface_tmp_hack : () -> (text) query;
+  _dev_get_group_canister : () -> (Result) query;
+  _dev_get_reward_canister : () -> (Result) query;
+  _dev_set_group_canister_id : (principal) -> (Result);
+  _dev_set_reward_canister_id : (principal) -> (Result);
+  clear_reward_buffer : () -> ();
+  get_all_ids : () -> (vec record { text; nat64 }) query;
+  get_history_point : () -> (Result_1) query;
+  icts_name : () -> (text) query;
+  icts_version : () -> (text) query;
+  next_history_point : () -> (Result_1);
+  notify_active_user : (principal) -> (Result_2);
+  notify_group_member_count_changed : (nat64) -> (Result_2);
+  notify_referral_accepted : (principal) -> (Result_2);
+  read_reward_buffer : () -> (Result_3) query;
+  reward_timer_next_trigger : () -> (Result_1) query;
+}

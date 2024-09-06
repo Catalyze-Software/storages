@@ -159,7 +159,8 @@ type Result_4 = variant {
 };
 type Result_5 = variant { Ok : bool; Err : ApiError };
 type Result_6 = variant { Ok; Err : ApiError };
-type Result_7 = variant { Ok : nat64; Err : ApiError };
+type Result_7 = variant { Ok : vec principal; Err : ApiError };
+type Result_8 = variant { Ok : nat64; Err : ApiError };
 type Role = record {
   permissions : vec Permission;
   name : text;
@@ -196,9 +197,11 @@ service : (vec principal) -> {
   icts_version : () -> (text) query;
   insert : (EventWithAttendees) -> (Result_4);
   insert_by_key : (nat64, EventWithAttendees) -> (Result_4);
+  insert_many : (vec EventWithAttendees) -> (Result_1);
   remove : (nat64) -> (Result_5);
   remove_many : (vec nat64) -> (Result_6);
-  size : () -> (Result_7) composite_query;
+  set_proxies : (vec principal) -> (Result_7);
+  size : () -> (Result_8) composite_query;
   update : (nat64, EventWithAttendees) -> (Result_4);
   update_many : (vec record { nat64; EventWithAttendees }) -> (Result_1);
 }

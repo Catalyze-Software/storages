@@ -1,14 +1,26 @@
 {
+  "index_boosted": {
+    "development": "vyeaw-2yaaa-aaaap-ahw2a-cai"
+  },
   "index_event": {
     "development": "i4fbf-wyaaa-aaaap-ahtbq-cai"
   },
+  "index_friend_request": {
+    "development": "vwgn6-biaaa-aaaap-ahw3a-cai"
+  },
   "index_group": {
     "development": "ivgkz-aqaaa-aaaap-ahtaa-cai"
+  },
+  "index_notification": {
+    "development": "xz5up-6qaaa-aaaap-ahwxq-cai"
   },
   "index_profile": {
     "development": "qj423-uyaaa-aaaap-aho4a-cai"
   },
   "index_report": {
     "development": "iha5a-maaaa-aaaap-ahtda-cai"
+  },
+  "index_topic": {
+    "development": "v7fgc-xaaaa-aaaap-ahw2q-cai"
   }
 }

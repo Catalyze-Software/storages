@@ -7,10 +7,10 @@ candid = "0.10"
 serde = { version = "1", features = ["derive"] }
 serde_bytes = "0.11"
 
-ic-cdk = "0.15"
+ic-cdk = "0.16"
 ic-stable-structures = "0.6"
-ic-ledger-types = "0.12"
-ic-cdk-timers = "0.9"
+ic-ledger-types = "0.13"
+ic-cdk-timers = "0.10"
 
 async-trait = "0.1"
 futures = "0.3"

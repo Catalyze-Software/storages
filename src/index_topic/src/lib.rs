@@ -25,6 +25,7 @@ pub fn __export_did_tmp_() -> String {
     use crate::aliases::*;
     use candid::export_service;
     use catalyze_shared::paged_response::PagedResponse;
+    use common::Principals;
 
     export_service!();
     __export_service()
