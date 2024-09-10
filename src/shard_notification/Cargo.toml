@@ -1,0 +1,19 @@
+[package]
+name = "shard_notification"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+candid = { workspace = true }
+ic-cdk = { workspace = true }
+
+ic-stable-structures = { workspace = true }
+
+catalyze-shared = { workspace = true }
+
+common = { path = "../common" }

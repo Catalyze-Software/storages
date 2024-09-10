@@ -31,6 +31,27 @@ where
         })
     }
 
+    fn insert_by_key_many(&self, list: Vec<(K, V)>) -> CanisterResult<Vec<(K, V)>> {
+        self.storage().with(|data| {
+            for (key, _) in list.clone() {
+                if !data.borrow().contains_key(&key) {
+                    continue;
+                }
+
+                return Err(ApiError::duplicate()
+                    .add_method_name("insert_by_key_many")
+                    .add_info(self.name().as_str())
+                    .add_message("Key already exists"));
+            }
+
+            for (key, value) in list.clone() {
+                data.borrow_mut().insert(key.clone(), value.clone());
+            }
+
+            Ok(list)
+        })
+    }
+
     fn get(&self, key: K) -> CanisterResult<(K, V)> {
         self.storage().with(|data| {
             data.borrow()
@@ -42,6 +63,11 @@ where
                 )
                 .map(|value| (key, value))
         })
+    }
+
+    fn get_opt(&self, key: K) -> Option<(K, V)> {
+        self.storage()
+            .with(|data| data.borrow().get(&key).map(|value| (key, value)))
     }
 
     fn get_many(&self, keys: Vec<K>) -> Vec<(K, V)> {
@@ -89,6 +115,13 @@ where
                     .add_message("Key does not exist"));
             }
 
+            data.borrow_mut().insert(key.clone(), value.clone());
+            Ok((key, value))
+        })
+    }
+
+    fn upsert(&self, key: K, value: V) -> CanisterResult<(K, V)> {
+        self.storage().with(|data| {
             data.borrow_mut().insert(key.clone(), value.clone());
             Ok((key, value))
         })

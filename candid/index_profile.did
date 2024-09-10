@@ -104,9 +104,18 @@ type ProfileMetadata = record {
   date_of_birth : nat64;
 };
 type ProfileReferences = record {
+<<<<<<< HEAD
   groups : vec nat64;
   starred : vec Subject;
   interests : vec nat32;
+=======
+  referrer : opt principal;
+  groups : vec nat64;
+  notifications : vec record { nat64; UserNotificationData };
+  starred : vec Subject;
+  interests : vec nat32;
+  referrals : vec record { principal; Referral };
+>>>>>>> main
   pinned : vec Subject;
   wallets : vec record { text; Wallet };
   events : vec nat64;
@@ -129,6 +138,10 @@ type ProfileWithRefs = record {
   privacy : Privacy;
   application_role : ApplicationRole;
 };
+<<<<<<< HEAD
+=======
+type Referral = record { created_at : nat64 };
+>>>>>>> main
 type Result = variant { Ok : vec Shard; Err : ApiError };
 type Result_1 = variant {
   Ok : vec record { principal; ProfileWithRefs };
@@ -145,7 +158,8 @@ type Result_4 = variant {
 };
 type Result_5 = variant { Ok : bool; Err : ApiError };
 type Result_6 = variant { Ok; Err : ApiError };
-type Result_7 = variant { Ok : nat64; Err : ApiError };
+type Result_7 = variant { Ok : vec principal; Err : ApiError };
+type Result_8 = variant { Ok : nat64; Err : ApiError };
 type Shard = record { id : principal; filled : bool };
 type SortDirection = variant { Asc; Desc };
 type Subject = variant {
@@ -163,11 +177,16 @@ type TokenGated = record {
   amount : nat64;
   standard : text;
 };
+<<<<<<< HEAD
+=======
+type UserNotificationData = record { is_read : bool; is_sender : bool };
+>>>>>>> main
 type ValidationResponse = record { field : text; message : text };
 type Wallet = record { provider : text; is_primary : bool };
 service : (vec principal) -> {
   __get_candid_interface_tmp_hack : () -> (text) query;
   _dev_extend_shards : (nat64) -> (Result);
+  _dev_get_shards : () -> (Result) query;
   _dev_set_shard_filled : (principal, bool) -> (Result);
   _dev_upload_wasm : (blob) -> (bool);
   filter : (vec ProfileFilter) -> (Result_1) composite_query;
@@ -182,9 +201,17 @@ service : (vec principal) -> {
   icts_name : () -> (text) query;
   icts_version : () -> (text) query;
   insert : (principal, ProfileWithRefs) -> (Result_4);
+<<<<<<< HEAD
   remove : (principal) -> (Result_5);
   remove_many : (vec principal) -> (Result_6);
   size : () -> (Result_7) composite_query;
+=======
+  insert_many : (vec record { principal; ProfileWithRefs }) -> (Result_1);
+  remove : (principal) -> (Result_5);
+  remove_many : (vec principal) -> (Result_6);
+  set_proxies : (vec principal) -> (Result_7);
+  size : () -> (Result_8) composite_query;
+>>>>>>> main
   update : (principal, ProfileWithRefs) -> (Result_4);
   update_many : (vec record { principal; ProfileWithRefs }) -> (Result_1);
 }

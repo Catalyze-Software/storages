@@ -3,11 +3,14 @@ use std::{collections::HashMap, fmt::Display};
 use async_trait::async_trait;
 use candid::Principal;
 use catalyze_shared::{
-    api_error::ApiError, paged_response::PagedResponse, CanisterResult, Filter, Sorter,
+    api_error::ApiError, paged_response::PagedResponse, CanisterResult, CellStorage, Filter, Sorter,
+};
+use ic_cdk::api::management_canister::main::{
+    install_code, CanisterInstallMode, InstallCodeArgument,
 };
 use ic_stable_structures::Storable;
 
-use crate::{CellStorage, IndexConfig, Registry, ShardClient};
+use crate::{spawn_shard, IndexConfig, Registry, ShardClient, ShardsIndex};
 
 #[async_trait]
 pub trait IndexController<K, V, F, S>: Send + Sync
@@ -38,6 +41,64 @@ where
     /// Shard client
     fn client(&self) -> impl ShardClient<K, V, F> {
         IndexShardClient
+    }
+
+    /// Upgrade shard wasm code by canister id
+    async fn upgrade_shard(&self, canister_id: Principal) -> CanisterResult<()> {
+        if !self.config().shards().get()?.contains(canister_id) {
+            return Err(ApiError::not_found()
+                .add_message(format!("Shard with the id {canister_id} not found")));
+        }
+
+        let wasm_module = self.config().shard_wasm().get()?;
+
+        let install_args = InstallCodeArgument {
+            mode: CanisterInstallMode::Upgrade(None),
+            canister_id,
+            wasm_module,
+            arg: vec![],
+        };
+
+        install_code(install_args)
+            .await
+            .map_err(|(_, err)| ApiError::unexpected().add_message(err.as_str()))?;
+
+        Ok(())
+    }
+
+    /// Extend the number of shards
+    async fn extend_shards(&self, shards: u64) -> CanisterResult<ShardsIndex> {
+        let shard_ids = self.config().shards().get().unwrap_or_default();
+        let shard_wasm = self.config().shard_wasm().get()?;
+        let mut new_shards_list = shard_ids.to_vec();
+
+        for _ in 0..shards {
+            new_shards_list.push(spawn_shard(shard_wasm.clone()).await?);
+        }
+        let shard_ids = self.config().shards().set(new_shards_list.clone().into())?;
+
+        if self.config().shard_iter().get().is_err() {
+            self.config().shard_iter().set(new_shards_list[0].id())?;
+        }
+
+        Ok(shard_ids)
+    }
+
+    /// Set the shard filled status
+    fn set_shard_filled(&self, shard: Principal, filled: bool) -> CanisterResult<ShardsIndex> {
+        let mut shard_ids = self.config().shards().get()?.to_vec();
+
+        let idx = shard_ids
+            .iter()
+            .position(|s| s.id() == shard)
+            .ok_or_else(|| {
+                ApiError::not_found().add_message(format!("Shard with the id {shard} not found"))
+            })?;
+
+        let shard = shard_ids.get_mut(idx).expect("Shard not found");
+        shard.set_filled(filled);
+
+        self.config().shards().set(shard_ids.clone().into())
     }
 
     /// Get the next shard in the round-robin sequence
@@ -199,6 +260,31 @@ where
         let shard = self.next_shard()?;
         self.config().registry().insert(key.clone(), shard)?;
         self.client().insert(shard, key, value).await
+    }
+
+    async fn insert_many(&self, list: Vec<(K, V)>) -> CanisterResult<Vec<(K, V)>> {
+        let list_map = list.clone().into_iter().collect::<HashMap<_, _>>();
+
+        let ids_map = list
+            .clone()
+            .into_iter()
+            .try_fold(HashMap::new(), |mut acc, (id, _)| {
+                let shard = self.next_shard()?;
+                let entry: &mut Vec<K> = acc.entry(shard).or_default();
+                entry.push(id);
+                Ok(acc)
+            })?;
+
+        for (shard, ids) in ids_map.into_iter() {
+            let list = ids
+                .into_iter()
+                .map(|id| (id.clone(), list_map.get(&id).unwrap().clone()))
+                .collect();
+
+            self.client().insert_many(shard, list).await?;
+        }
+
+        Ok(list)
     }
 
     async fn update(&self, key: K, value: V) -> CanisterResult<(K, V)> {

@@ -1,5 +1,5 @@
-use catalyze_shared::CanisterResult;
-use common::{is_developer, is_storage_index, CellStorage, ShardController};
+use catalyze_shared::{CanisterResult, CellStorage};
+use common::{is_developer, is_storage_index, ShardController};
 use ic_cdk::{query, update};
 
 use crate::{
@@ -53,6 +53,11 @@ fn filter(filters: Vec<EntryFilter>) -> CanisterResult<Vec<Entry>> {
 #[update(guard = "is_index_guard")]
 fn insert(key: Key, value: Value) -> CanisterResult<Entry> {
     controller().insert(key, value)
+}
+
+#[update(guard = "is_index_guard")]
+fn insert_many(list: Vec<Entry>) -> CanisterResult<Vec<Entry>> {
+    controller().insert_many(list)
 }
 
 #[update(guard = "is_index_guard")]

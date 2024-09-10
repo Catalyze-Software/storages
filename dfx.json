@@ -1,5 +1,47 @@
 {
   "canisters": {
+    "index_boosted": {
+      "type": "custom",
+      "package": "index_boosted",
+      "candid": "candid/index_boosted.did",
+      "wasm": "wasm/index_boosted.wasm.gz",
+      "build": [
+        "bash scripts/build.sh"
+      ],
+      "metadata": [
+        {
+          "name": "candid:service"
+        }
+      ]
+    },
+    "index_topic": {
+      "type": "custom",
+      "package": "index_topic",
+      "candid": "candid/index_topic.did",
+      "wasm": "wasm/index_topic.wasm.gz",
+      "build": [
+        "bash scripts/build.sh"
+      ],
+      "metadata": [
+        {
+          "name": "candid:service"
+        }
+      ]
+    },
+    "index_friend_request": {
+      "type": "custom",
+      "package": "index_topic",
+      "candid": "candid/index_topic.did",
+      "wasm": "wasm/index_topic.wasm.gz",
+      "build": [
+        "bash scripts/build.sh"
+      ],
+      "metadata": [
+        {
+          "name": "candid:service"
+        }
+      ]
+    },
     "index_profile": {
       "type": "custom",
       "package": "index_profile",
@@ -7,6 +49,11 @@
       "wasm": "wasm/index_profile.wasm.gz",
       "build": [
         "bash scripts/build.sh"
+      ],
+      "metadata": [
+        {
+          "name": "candid:service"
+        }
       ]
     },
     "shard_profile": {
@@ -16,6 +63,123 @@
       "wasm": "wasm/shard_profile.wasm.gz",
       "build": [
         "bash scripts/build.sh"
+      ],
+      "metadata": [
+        {
+          "name": "candid:service"
+        }
+      ]
+    },
+    "index_group": {
+      "type": "custom",
+      "package": "index_group",
+      "candid": "candid/index_group.did",
+      "wasm": "wasm/index_group.wasm.gz",
+      "build": [
+        "bash scripts/build.sh"
+      ],
+      "metadata": [
+        {
+          "name": "candid:service"
+        }
+      ]
+    },
+    "shard_group": {
+      "type": "custom",
+      "package": "shard_group",
+      "candid": "candid/shard_group.did",
+      "wasm": "wasm/shard_group.wasm.gz",
+      "build": [
+        "bash scripts/build.sh"
+      ],
+      "metadata": [
+        {
+          "name": "candid:service"
+        }
+      ]
+    },
+    "index_event": {
+      "type": "custom",
+      "package": "index_event",
+      "candid": "candid/index_event.did",
+      "wasm": "wasm/index_event.wasm.gz",
+      "build": [
+        "bash scripts/build.sh"
+      ],
+      "metadata": [
+        {
+          "name": "candid:service"
+        }
+      ]
+    },
+    "shard_event": {
+      "type": "custom",
+      "package": "shard_event",
+      "candid": "candid/shard_event.did",
+      "wasm": "wasm/shard_event.wasm.gz",
+      "build": [
+        "bash scripts/build.sh"
+      ],
+      "metadata": [
+        {
+          "name": "candid:service"
+        }
+      ]
+    },
+    "index_report": {
+      "type": "custom",
+      "package": "index_report",
+      "candid": "candid/index_report.did",
+      "wasm": "wasm/index_report.wasm.gz",
+      "build": [
+        "bash scripts/build.sh"
+      ],
+      "metadata": [
+        {
+          "name": "candid:service"
+        }
+      ]
+    },
+    "shard_report": {
+      "type": "custom",
+      "package": "shard_report",
+      "candid": "candid/shard_report.did",
+      "wasm": "wasm/shard_report.wasm.gz",
+      "build": [
+        "bash scripts/build.sh"
+      ],
+      "metadata": [
+        {
+          "name": "candid:service"
+        }
+      ]
+    },
+    "index_notification": {
+      "type": "custom",
+      "package": "index_notification",
+      "candid": "candid/index_notification.did",
+      "wasm": "wasm/index_notification.wasm.gz",
+      "build": [
+        "bash scripts/build.sh"
+      ],
+      "metadata": [
+        {
+          "name": "candid:service"
+        }
+      ]
+    },
+    "shard_notification": {
+      "type": "custom",
+      "package": "shard_notification",
+      "candid": "candid/shard_notification.did",
+      "wasm": "wasm/shard_notification.wasm.gz",
+      "build": [
+        "bash scripts/build.sh"
+      ],
+      "metadata": [
+        {
+          "name": "candid:service"
+        }
       ]
     }
   },

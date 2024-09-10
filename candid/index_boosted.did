@@ -29,10 +29,18 @@ type Boost = record {
 };
 type BoostedFilter = variant {
   Ids : vec nat64;
+<<<<<<< HEAD
+=======
+  SubjectType : SubjectType;
+>>>>>>> main
   UpdatedAt : DateRange;
   None;
   Owner : principal;
   CreatedAt : DateRange;
+<<<<<<< HEAD
+=======
+  Subject : Subject;
+>>>>>>> main
 };
 type BoostedSort = variant {
   UpdatedAt : SortDirection;
@@ -52,7 +60,12 @@ type Result_2 = variant { Ok : opt record { nat64; Boost }; Err : ApiError };
 type Result_3 = variant { Ok : record { nat64; Boost }; Err : ApiError };
 type Result_4 = variant { Ok : bool; Err : ApiError };
 type Result_5 = variant { Ok; Err : ApiError };
+<<<<<<< HEAD
 type Result_6 = variant { Ok : nat64; Err : ApiError };
+=======
+type Result_6 = variant { Ok : vec principal; Err : ApiError };
+type Result_7 = variant { Ok : nat64; Err : ApiError };
+>>>>>>> main
 type SortDirection = variant { Asc; Desc };
 type Subject = variant {
   Event : nat64;
@@ -62,6 +75,10 @@ type Subject = variant {
   Member : principal;
   Profile : principal;
 };
+<<<<<<< HEAD
+=======
+type SubjectType = variant { Event; Group; Attendee; None; Member; Profile };
+>>>>>>> main
 type ValidationResponse = record { field : text; message : text };
 service : (vec principal) -> {
   __get_candid_interface_tmp_hack : () -> (text) query;
@@ -78,9 +95,17 @@ service : (vec principal) -> {
   icts_version : () -> (text) query;
   insert : (Boost) -> (Result_3);
   insert_by_key : (nat64, Boost) -> (Result_3);
+<<<<<<< HEAD
   remove : (nat64) -> (Result_4);
   remove_many : (vec nat64) -> (Result_5);
   size : () -> (Result_6) query;
+=======
+  insert_many : (vec Boost) -> (Result);
+  remove : (nat64) -> (Result_4);
+  remove_many : (vec nat64) -> (Result_5);
+  set_proxies : (vec principal) -> (Result_6);
+  size : () -> (Result_7) query;
+>>>>>>> main
   update : (nat64, Boost) -> (Result_3);
   update_many : (vec record { nat64; Boost }) -> (Result);
 }
