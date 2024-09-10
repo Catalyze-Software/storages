@@ -24,6 +24,7 @@ impl Migrate {
         let proxy_profiles = ProxyCalls::get_profiles().await?;
         let proxy_members = ProxyCalls::get_members().await?;
         let proxy_attendees = ProxyCalls::get_attendees().await?;
+        let proxy_user_notifications = ProxyCalls::get_user_notifications().await?;
 
         let mut mapped: HashMap<Principal, ProfileWithRefs> = HashMap::new();
 
@@ -49,12 +50,20 @@ impl Migrate {
 
             events.append(&mut attendee.invites.keys().cloned().collect());
 
+            let user_notifications = proxy_user_notifications
+                .clone()
+                .into_iter()
+                .find(|(key, _)| key == &principal)
+                .map(|(_, notification)| notification)
+                .unwrap_or_default();
+
             mapped.insert(
                 principal,
                 ProfileMapArgs {
                     profile: profile.clone(),
                     groups,
                     events,
+                    user_notifications,
                 }
                 .into(),
             );

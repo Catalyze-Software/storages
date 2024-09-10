@@ -9,12 +9,14 @@ use catalyze_shared::{
         profile_references::ProfileReferences,
     },
     profile_with_refs::ProfileWithRefs,
+    user_notifications::UserNotifications,
 };
 
 pub struct ProfileMapArgs {
     pub profile: Profile,
     pub groups: Vec<u64>,
     pub events: Vec<u64>,
+    pub user_notifications: UserNotifications,
 }
 
 impl From<ProfileMapArgs> for ProfileWithRefs {
@@ -23,6 +25,7 @@ impl From<ProfileMapArgs> for ProfileWithRefs {
             profile,
             groups,
             events,
+            user_notifications,
         } = args;
         ProfileWithRefs {
             metadata: ProfileMetadata {
@@ -77,6 +80,9 @@ impl From<ProfileMapArgs> for ProfileWithRefs {
                         .iter()
                         .map(|(principal, wallet)| (principal.to_string(), wallet.clone())),
                 ),
+                notifications: user_notifications,
+                referrals: HashMap::new(),
+                referrer: None,
             },
             updated_on: profile.updated_on,
         }
