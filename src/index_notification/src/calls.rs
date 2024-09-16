@@ -60,6 +60,18 @@ async fn _dev_upgrade_shard(shard: Principal) -> CanisterResult<()> {
     controller().upgrade_shard(shard).await
 }
 
+#[update(guard = "is_proxy_guard")]
+async fn _dev_upgrade_all_shard() -> CanisterResult<(u64, Vec<Principal>)> {
+    let mut success: Vec<Principal> = vec![];
+    let shards = config().shards().get()?.to_vec();
+    for shard in shards.clone() {
+        if let Ok(()) = controller().upgrade_shard(shard.id()).await {
+            success.push(shard.id());
+        }
+    }
+    Ok((shards.len() as u64, success))
+}
+
 #[query(composite = true, guard = "is_proxy_guard")]
 async fn size() -> CanisterResult<u64> {
     controller().size().await

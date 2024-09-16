@@ -1,6 +1,7 @@
 type Activity = variant {
   UserActivity : principal;
   UserReferral : principal;
+  UserProfileFilled : principal;
   GroupMemberCount : nat64;
 };
 type ApiError = record {
@@ -46,6 +47,7 @@ service : (vec principal) -> {
   next_history_point : () -> (Result_1);
   notify_active_user : (principal) -> (Result_2);
   notify_group_member_count_changed : (nat64) -> (Result_2);
+  notify_profile_filled : (principal) -> (Result_2);
   notify_referral_accepted : (principal) -> (Result_2);
   read_reward_buffer : () -> (Result_3) query;
   reward_timer_next_trigger : () -> (Result_1) query;

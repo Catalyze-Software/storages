@@ -10,11 +10,12 @@ use catalyze_shared::{
     member_collection::MemberCollection,
     profile_with_refs::ProfileWithRefs,
 };
-use serde::de::DeserializeOwned;
+use serde::{de::DeserializeOwned, Serialize};
 
 use crate::{
     canister_methods::Canister, event_mapper::EventMapArgs, group_mapper::GroupMapArgs,
     index_methods::IndexCalls, profile_mapper::ProfileMapArgs, proxy_methods::ProxyCalls,
+    utils::context,
 };
 
 pub struct Migrate;
@@ -29,6 +30,9 @@ impl Migrate {
         let mut mapped: HashMap<Principal, ProfileWithRefs> = HashMap::new();
 
         for (principal, profile) in proxy_profiles {
+            if principal.as_slice().len() < 29 {
+                continue;
+            }
             let member = proxy_members
                 .clone()
                 .into_iter()
@@ -72,7 +76,7 @@ impl Migrate {
         migrate::<Principal, ProfileWithRefs>(
             "profiles",
             mapped.into_iter().collect(),
-            None, // Some(context().indexes.profiles),
+            Some(context().indexes.profiles),
         )
         .await
     }
@@ -161,7 +165,12 @@ impl Migrate {
             );
         }
 
-        migrate("groups", mapped.into_iter().collect(), None).await
+        migrate(
+            "groups",
+            mapped.into_iter().collect(),
+            Some(context().indexes.groups),
+        )
+        .await
     }
 
     pub async fn events() -> eyre::Result<(u32, u32)> {
@@ -240,33 +249,57 @@ impl Migrate {
             );
         }
 
-        migrate("events", mapped.into_iter().collect(), None).await
+        migrate(
+            "events",
+            mapped.into_iter().collect(),
+            Some(context().indexes.events),
+        )
+        .await
     }
 
     pub async fn reports() -> eyre::Result<(u32, u32)> {
         let proxy_reports = ProxyCalls::get_reports().await?;
-        migrate("reports", proxy_reports, None).await
+        migrate("reports", proxy_reports, Some(context().indexes.reports)).await
     }
 
-    // pub async fn friend_requests() -> eyre::Result<(u32, u32)> {
-    //     migrate("friend_requests", vec![], None).await
-    // }
+    pub async fn friend_requests() -> eyre::Result<(u32, u32)> {
+        let friend_requests = ProxyCalls::get_friend_requests().await?;
+        migrate(
+            "friend_requests",
+            friend_requests,
+            Some(context().indexes.friend_requests),
+        )
+        .await
+    }
 
-    // pub async fn notifications() -> eyre::Result<(u32, u32)> {
-    //     migrate("notifications", vec![], None).await
-    // }
+    pub async fn notifications() -> eyre::Result<(u32, u32)> {
+        let notifications = ProxyCalls::get_notifications().await?;
+        migrate(
+            "notifications",
+            notifications,
+            Some(context().indexes.notifications),
+        )
+        .await
+    }
+
+    pub async fn boosts() -> eyre::Result<(u32, u32)> {
+        let proxy_boosts = ProxyCalls::get_boosted().await?;
+
+        migrate("boosts", proxy_boosts, Some(context().indexes.boosted)).await
+    }
 
     pub async fn all() -> eyre::Result<()> {
-        let profiles = Migrate::profiles().await?;
-        let groups = Migrate::groups().await?;
+        // let profiles = Migrate::profiles().await?;
+        // let groups = Migrate::groups().await?;
         let events = Migrate::events().await?;
         let reports = Migrate::reports().await?;
-        // let friend_requests = Migrate::friend_requests().await?;
-        // let notifications = Migrate::notifications().await?;
+        let friend_requests = Migrate::friend_requests().await?;
+        let notifications = Migrate::notifications().await?;
+        let boosted = Migrate::boosts().await?;
 
         println!(
-            "Migration completed: profiles: {:?}, groups: {:?}, events: {:?}, reports: {:?}",
-            profiles, groups, events, reports
+            "Migration completed: events: {:?}, reports: {:?}, friend_requests: {:?}, notifications: {:?}, boosted: {:?}",
+             events, reports, friend_requests, notifications, boosted
         );
 
         Ok(())
@@ -279,8 +312,8 @@ pub async fn migrate<K, V>(
     index: Option<Canister>,
 ) -> eyre::Result<(u32, u32)>
 where
-    K: CandidType + Clone + DeserializeOwned + Debug,
-    V: CandidType + Clone + DeserializeOwned + Debug,
+    K: CandidType + Clone + DeserializeOwned + Serialize + Debug,
+    V: CandidType + Clone + DeserializeOwned + Serialize + Debug,
 {
     let mut success: u32 = 0;
     let mut failed: u32 = 0;
@@ -297,7 +330,8 @@ where
                     success += 1;
                 }
                 Err(e) => {
-                    println!("Failed to migrate item {:?}: {:?}", key, e);
+                    println!("{:?}", value);
+                    // println!("Failed to migrate item {:?}: {:?}", key, e);
                     failed += 1;
                 }
             }

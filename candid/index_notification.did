@@ -136,19 +136,23 @@ type RelationNotificationType = variant {
 };
 type Result = variant { Ok : vec Shard; Err : ApiError };
 type Result_1 = variant {
+  Ok : record { nat64; vec principal };
+  Err : ApiError;
+};
+type Result_2 = variant { Ok; Err : ApiError };
+type Result_3 = variant {
   Ok : vec record { nat64; Notification };
   Err : ApiError;
 };
-type Result_2 = variant { Ok : PagedResponse; Err : ApiError };
-type Result_3 = variant {
+type Result_4 = variant { Ok : PagedResponse; Err : ApiError };
+type Result_5 = variant {
   Ok : opt record { nat64; Notification };
   Err : ApiError;
 };
-type Result_4 = variant { Ok : record { nat64; Notification }; Err : ApiError };
-type Result_5 = variant { Ok : bool; Err : ApiError };
-type Result_6 = variant { Ok; Err : ApiError };
-type Result_7 = variant { Ok : vec principal; Err : ApiError };
-type Result_8 = variant { Ok : nat64; Err : ApiError };
+type Result_6 = variant { Ok : record { nat64; Notification }; Err : ApiError };
+type Result_7 = variant { Ok : bool; Err : ApiError };
+type Result_8 = variant { Ok : vec principal; Err : ApiError };
+type Result_9 = variant { Ok : nat64; Err : ApiError };
 type Shard = record { id : principal; filled : bool };
 type SortDirection = variant { Asc; Desc };
 type TransactionCompleteData = record {
@@ -178,29 +182,31 @@ service : (vec principal) -> {
   _dev_extend_shards : (nat64) -> (Result);
   _dev_get_shards : () -> (Result) query;
   _dev_set_shard_filled : (principal, bool) -> (Result);
+  _dev_upgrade_all_shard : () -> (Result_1);
+  _dev_upgrade_shard : (principal) -> (Result_2);
   _dev_upload_wasm : (blob) -> (bool);
-  filter : (vec NotificationFilter) -> (Result_1) composite_query;
+  filter : (vec NotificationFilter) -> (Result_3) composite_query;
   filter_paginated : (
       nat64,
       nat64,
       NotificationSort,
       vec NotificationFilter,
-    ) -> (Result_2) composite_query;
-  find : (vec NotificationFilter) -> (Result_3) composite_query;
-  get : (nat64) -> (Result_4) composite_query;
-  get_all : () -> (Result_1) composite_query;
-  get_many : (vec nat64) -> (Result_1) composite_query;
+    ) -> (Result_4) composite_query;
+  find : (vec NotificationFilter) -> (Result_5) composite_query;
+  get : (nat64) -> (Result_6) composite_query;
+  get_all : () -> (Result_3) composite_query;
+  get_many : (vec nat64) -> (Result_3) composite_query;
   get_paginated : (nat64, nat64, NotificationSort) -> (
-      Result_2,
+      Result_4,
     ) composite_query;
   icts_name : () -> (text) query;
   icts_version : () -> (text) query;
-  insert : (Notification) -> (Result_4);
-  insert_by_key : (nat64, Notification) -> (Result_4);
-  remove : (nat64) -> (Result_5);
-  remove_many : (vec nat64) -> (Result_6);
-  set_proxies : (vec principal) -> (Result_7);
-  size : () -> (Result_8) composite_query;
-  update : (nat64, Notification) -> (Result_4);
-  update_many : (vec record { nat64; Notification }) -> (Result_1);
+  insert : (Notification) -> (Result_6);
+  insert_by_key : (nat64, Notification) -> (Result_6);
+  remove : (nat64) -> (Result_7);
+  remove_many : (vec nat64) -> (Result_2);
+  set_proxies : (vec principal) -> (Result_8);
+  size : () -> (Result_9) composite_query;
+  update : (nat64, Notification) -> (Result_6);
+  update_many : (vec record { nat64; Notification }) -> (Result_3);
 }

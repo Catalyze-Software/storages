@@ -130,7 +130,7 @@ impl ProxyCalls {
 }
 
 pub fn proxy_by_environment() -> Canister {
-    match AGENT.1 {
+    match AGENT.environment {
         Environment::Development => Canister::new("bwm3m-wyaaa-aaaag-qdiua-cai"),
         // Environment::Staging => Principal::from_text("24swh-4iaaa-aaaap-ahevq-cai").unwrap(),
         Environment::Staging => panic!("Staging not implemented"),

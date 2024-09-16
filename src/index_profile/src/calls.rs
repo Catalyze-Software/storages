@@ -3,7 +3,8 @@ use std::time::Duration;
 use candid::Principal;
 use catalyze_shared::{paged_response::PagedResponse, CanisterResult, CellStorage};
 use common::{
-    is_developer, is_proxy, IndexConfig, IndexConfigBase, IndexController, Principals, ShardsIndex,
+    is_developer, is_migration, is_proxy, IndexConfig, IndexConfigBase, IndexController,
+    Principals, ShardsIndex,
 };
 use ic_cdk::{init, post_upgrade, query, trap, update};
 use serde_bytes::ByteBuf;
@@ -58,6 +59,18 @@ async fn _dev_extend_shards(shards: u64) -> CanisterResult<ShardsIndex> {
 #[update(guard = "is_proxy_guard")]
 fn _dev_upload_wasm(wasm: ByteBuf) -> bool {
     config().shard_wasm().set(wasm.into_vec()).is_ok()
+}
+
+#[update(guard = "is_proxy_guard")]
+async fn _dev_upgrade_all_shard() -> CanisterResult<(u64, Vec<Principal>)> {
+    let mut success: Vec<Principal> = vec![];
+    let shards = config().shards().get()?.to_vec();
+    for shard in shards.clone() {
+        if let Ok(()) = controller().upgrade_shard(shard.id()).await {
+            success.push(shard.id());
+        }
+    }
+    Ok((shards.len() as u64, success))
 }
 
 #[update(guard = "is_proxy_guard")]
@@ -139,6 +152,11 @@ async fn update(key: Key, value: Value) -> CanisterResult<Entry> {
 #[update(guard = "is_proxy_guard")]
 async fn update_many(list: Vec<Entry>) -> CanisterResult<Vec<Entry>> {
     controller().update_many(list).await
+}
+
+#[update(guard = "is_migration")]
+async fn insert_by_key(key: Key, value: Value) -> CanisterResult<Entry> {
+    controller().insert(key, value).await
 }
 
 #[update(guard = "is_proxy_guard")]

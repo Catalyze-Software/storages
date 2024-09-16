@@ -1,7 +1,10 @@
 use lazy_static::lazy_static;
 use std::sync::Arc;
 
-use ic_agent::{identity::BasicIdentity, Agent};
+use ic_agent::{
+    identity::{BasicIdentity, Secp256k1Identity},
+    Agent,
+};
 
 use crate::{
     canister_methods::Canister,
@@ -20,8 +23,14 @@ pub enum Environment {
     Production,
 }
 
+pub struct AgentData {
+    pub query_agent: Agent,
+    pub migration_agent: Agent,
+    pub environment: Environment,
+}
+
 lazy_static! {
-    pub static ref AGENT: Arc<(Agent, Environment)> = {
+    pub static ref AGENT: Arc<AgentData> = {
         let environment: Environment = match std::env::var("ENV") {
             Ok(env) => match env.as_str() {
                 "development" => Environment::Development,
@@ -34,25 +43,39 @@ lazy_static! {
         let ic_url = "https://icp0.io/";
         let home_dir = std::env::var("HOME").expect("HOME environment variable is not set");
 
-        // development / staging / production
-        let identity_path = format!(
+        let query_identity_path = format!(
             "{}/.config/dfx/identity/catalyze_{}/identity.pem",
             home_dir,
             std::env::var("ENV").expect("ENV environment variable is not set")
         );
 
-        let identity = BasicIdentity::from_pem_file(identity_path).expect("Failed to get identity");
+        // development / staging / production
+        let migration_identity_path = format!(
+            "{}/.config/dfx/identity/catalyze_migration/identity.pem",
+            home_dir,
+        );
 
-        let agent = Agent::builder()
+
+        let query_identity = BasicIdentity::from_pem_file(query_identity_path).expect("Failed to get identity");
+        let migration_identity = Secp256k1Identity::from_pem_file(migration_identity_path).expect("Failed to get identity");
+
+        let query_agent = Agent::builder()
             .with_url(ic_url)
-            .with_identity(identity)
+            .with_identity(query_identity)
             .build()
             .expect("Failed to build agent");
 
-        Arc::new((
-            agent,
-            environment)
-        )
+        let migration_agent = Agent::builder()
+            .with_url(ic_url)
+            .with_identity(migration_identity)
+            .build()
+            .expect("Failed to build agent");
+
+        Arc::new(AgentData {
+            query_agent,
+            migration_agent,
+            environment
+        })
 
         // here for reference and local testing
 
