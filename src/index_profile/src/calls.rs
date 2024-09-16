@@ -61,6 +61,18 @@ fn _dev_upload_wasm(wasm: ByteBuf) -> bool {
 }
 
 #[update(guard = "is_proxy_guard")]
+async fn _dev_upgrade_all_shard() -> CanisterResult<(u64, Vec<Principal>)> {
+    let mut success: Vec<Principal> = vec![];
+    let shards = config().shards().get()?.to_vec();
+    for shard in shards.clone() {
+        if let Ok(()) = controller().upgrade_shard(shard.id()).await {
+            success.push(shard.id());
+        }
+    }
+    Ok((shards.len() as u64, success))
+}
+
+#[update(guard = "is_proxy_guard")]
 fn _dev_set_shard_filled(shard: Principal, filled: bool) -> CanisterResult<ShardsIndex> {
     controller().set_shard_filled(shard, filled)
 }
