@@ -195,6 +195,7 @@ service : (vec principal) -> {
   icts_name : () -> (text) query;
   icts_version : () -> (text) query;
   insert : (principal, ProfileWithRefs) -> (Result_6);
+  insert_by_key : (principal, ProfileWithRefs) -> (Result_6);
   insert_many : (vec record { principal; ProfileWithRefs }) -> (Result_3);
   remove : (principal) -> (Result_7);
   remove_many : (vec principal) -> (Result_2);

@@ -1,6 +1,7 @@
 [workspace]
 resolver = "2"
 members = ["src/*"]
+exclude = ["src/tests", "src/migration"]
 
 [workspace.dependencies]
 candid = "0.10"
